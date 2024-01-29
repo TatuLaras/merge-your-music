@@ -11,8 +11,7 @@ function Index() {
     const login_uri: string = import.meta.env.VITE_AUTH_URI_INITIAL;
     
     const tokens = Cookies.get('own_tokens');
-
-    if(tokens) window.location.replace('/about');
+    if(tokens) window.location.replace('/room');
     
     return (
         <div className='wrapper' id='index'>
@@ -23,7 +22,6 @@ function Index() {
                     Login with Spotify
                 </a>
                 <hr />
-                {tokens}
             </div>
         </div>
     );

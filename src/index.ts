@@ -1,7 +1,9 @@
-import { FakeStoreService } from './FakeStoreService.js';
-import { Spotify } from './Spotify.js';
-import { StoreService } from './StoreService.js';
-import { randomString } from './helpers.js';
+import { FakeStoreService } from './FakeStoreService';
+import { Spotify } from './Spotify';
+import { StoreService } from './StoreService';
+import { randomString } from './helpers';
+import { WsErrorCode } from './common_types/ws_types';
+
 var cors = require('cors');
 
 const asyncHandler = require('express-async-handler');
@@ -16,7 +18,7 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 
 const store: StoreService = new FakeStoreService();
-const spotify: Spotify.Client = new Spotify.Client();
+const spotify: Spotify = new Spotify();
 
 app.use(cookieParser());
 app.use(
@@ -35,15 +37,13 @@ interface TRoom {
 let openConnections = new Map<string, TRoom>();
 
 app.ws('/', function (ws: any, req: any) {
-    ws.close(4002, 'Room id not specified.');
+    ws.close(WsErrorCode.RoomNotSpecified, 'Room id not specified.');
 });
 
 app.ws('/:id', function (ws: any, req: any) {
-    console.log('Connection attempt');
-
     const roomId = req.params.id;
     if (roomId.length == 0 || !openConnections.has(roomId)) {
-        ws.close(4000, 'Room not found.');
+        ws.close(WsErrorCode.RoomNotFound, 'Room not found.');
         return;
     }
 
@@ -57,7 +57,7 @@ app.ws('/:id', function (ws: any, req: any) {
     room.connections.push(ws);
 
     console.log(
-        `Connection opened, room: ${roomId}, ${room.connections.length} connections.`
+        `[${roomId}] Open: ${room.connections.length} clients connected.`
     );
 
     ws.on('message', function (msg: any) {
@@ -69,7 +69,9 @@ app.ws('/:id', function (ws: any, req: any) {
     });
     ws.on('close', function () {
         room.connections = room.connections.filter((conn) => conn != ws);
-        console.log(`Connection closed, room: ${roomId}, ${room.connections.length} connections.`);
+        console.log(
+            `[${roomId}] Close: ${room.connections.length} clients connected.`
+        );
     });
 });
 
@@ -119,19 +121,20 @@ app.get(
 );
 
 app.post('/new_room', (req: any, res: any) => {
-    const id_lenght = 12;
+    const id_lenght = 6;
     let room_id = randomString(id_lenght);
-    while (openConnections.has(room_id)) room_id = randomString(id_lenght);
+    while (openConnections.has(room_id)) {
+        room_id = randomString(id_lenght);
+    }
 
     openConnections.set(room_id, { created: new Date(), connections: [] });
     console.log(openConnections);
     res.send(room_id);
 
-    // Cleanup room ids
-    roomsCleanup();
+    cleanupRoomIds();
 });
 
-app.get('/room/:id', (req: any, res: any) => {
+app.get('/share/:id', (req: any, res: any) => {
     const roomId = req.params.id;
     if (!openConnections.has(roomId)) {
         res.status(404);
@@ -147,11 +150,11 @@ app.listen(process.env.BACKEND_PORT, () => {
     console.log(`Spotifuse listening on port ${process.env.BACKEND_PORT}`);
 });
 
-function roomsCleanup() {
+function cleanupRoomIds() {
     openConnections.forEach((room, id) => {
         if (
             room.created.getTime() <
-            new Date().getTime() - 1000 * 60 * 60 * 24
+            new Date().getTime() - 1000 * 60 * 60 * 24 // 24 hours
         ) {
             openConnections.delete(id);
         }
