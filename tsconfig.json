@@ -1,0 +1,8 @@
+{
+    "extends": "@tsconfig/node21/tsconfig.json",
+    "compilerOptions": {
+        "rootDir": "src",
+        "outDir": "build"
+    },
+    "exclude": ["spotifuse-frontend"]
+}
