@@ -21,6 +21,27 @@ function Room() {
         null
     );
     const [userProfile, setUserProfile] = useState<TSpotifyUser | null>(null);
+    const [likedSongs, setLikedSongs] = useState<object>({});
+    const [genres, setGenres] = useState<object>({});
+
+    // TODO: Cache songs etc. in local storage
+
+    function addLikedSongs(songs: object, genres: object) {
+        // TODO: Call this function when data received from websocket
+        setLikedSongs((old) => {
+            return {
+                ...songs,
+                ...old,
+            };
+        });
+
+        setGenres((old) => {
+            return {
+                ...genres,
+                ...old,
+            };
+        });
+    }
 
     function newRoomId(roomId: string) {
         console.log('Room ID: ' + roomId);
@@ -65,6 +86,15 @@ function Room() {
         spotifyClient.getMe().then((profile) => {
             if (profile) setUserProfile(profile);
         });
+    }
+
+    function getLikedSongs() {
+        if (!spotifyClient) {
+            alert('no spotify client!');
+            return;
+        }
+
+        spotifyClient.loadAllMeTracks(addLikedSongs);
     }
 
     function onClose(event: CloseEvent) {
@@ -117,12 +147,20 @@ function Room() {
                     Send ping
                 </button>
                 <button onClick={getProfile}>Get profile</button>
+                <button onClick={getLikedSongs}>Get liked songs</button>
                 <hr />
                 <p>Send this link to someone:</p>
                 <p>{link}</p>
                 <hr />
                 <pre>{log}</pre>
                 <ProfileSummary userProfile={userProfile} />
+                {Object.entries(genres).map(([key, value]) => (
+                    <div key={key}>{JSON.stringify(value)} ({key})</div>
+                ))}
+                <hr />
+                {Object.entries(likedSongs).map(([key, value]) => (
+                    <div key={key}>{value} ({key})</div>
+                ))}
             </div>
         </div>
     );

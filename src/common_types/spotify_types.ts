@@ -33,7 +33,7 @@ export interface TSpotifyTrack {
 
 export interface TSpotifyTrackInfo {
     album: TSpotifyAlbum;
-    artists: Array<TSpotifyArtist>;
+    artists: Array<TSpotifyArtistShort>;
     available_markets: Array<string>;
     disc_number: number;
     duration_ms: number;
@@ -53,7 +53,7 @@ export interface TSpotifyTrackInfo {
 
 export interface TSpotifyAlbum {
     album_type: string;
-    artists: Array<TSpotifyArtist>;
+    artists: Array<TSpotifyArtistShort>;
     available_markets: Array<string>;
     external_urls: { spotify: string };
     href: string;
@@ -67,11 +67,23 @@ export interface TSpotifyAlbum {
     uri: string;
 }
 
-export interface TSpotifyArtist {
+export interface TSpotifyArtistShort {
     external_urls: { spotify: string };
     href: string;
     id: string;
     name: string;
     type: 'artist';
     uri: string;
+}
+
+export interface TSpotifyArtist extends TSpotifyArtistShort {
+    followers: { href: string; total: number };
+    genres: Array<string>;
+    images: Array<TSpotifyImage>;
+    popularity: number;
+}
+
+export interface TSongData {
+    name: string;
+    artist: string;
 }

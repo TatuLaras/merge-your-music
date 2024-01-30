@@ -16,7 +16,7 @@ function Index() {
     return (
         <div className='wrapper' id='index'>
             <div className='content'>
-                <h1>Spotifuse your music!</h1>
+                <h1>Merge Your Music!</h1>
                 <p>Login with Spotify to continue.</p>
                 <a href={login_uri}>
                     Login with Spotify

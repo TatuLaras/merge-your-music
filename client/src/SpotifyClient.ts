@@ -42,4 +42,37 @@ export class SpotifyClient {
             `${this.baseUrl}/me/tracks`
         );
     }
+
+    async loadAllMeTracks(
+        newDataCallback: (songs: object, genres: object) => void
+    ) {
+        let nextUrl = `${this.baseUrl}/me/tracks?limit=50`;
+        while (nextUrl) {
+            const response =
+                await this.get<TSpotifyResponse<TSpotifyTrack>>(nextUrl);
+            console.log(response);
+
+            const songs: any = {};
+            const artistIdList: string[] = [];
+            const genres: any = {};
+
+            response.items.forEach((item) => {
+                songs[item.track.id] = item.track.name;
+                if (artistIdList.length < 50)
+                    artistIdList.push(item.track.artists[0].id);
+            });
+
+            const artistIdStr = artistIdList.join(',');
+            const artistResponse = await this.get<any>(
+                `${this.baseUrl}/artists?ids=${artistIdStr}`
+            );
+
+            artistResponse.artists.forEach((artist: any) => {
+                genres[artist.id] = artist.genres;
+            });
+
+            newDataCallback(songs, genres);
+            nextUrl = response.next;
+        }
+    }
 }
