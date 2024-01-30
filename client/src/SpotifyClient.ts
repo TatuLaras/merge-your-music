@@ -68,6 +68,7 @@ export class SpotifyClient {
             );
 
             artistResponse.artists.forEach((artist: any) => {
+                if(artist.genres.length == 0) return
                 genres[artist.id] = artist.genres;
             });
 

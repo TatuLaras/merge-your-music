@@ -1,7 +1,7 @@
 import { createLazyFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import useWebSocket from 'react-use-websocket';
-import { WsErrorCode } from '../../../src/common_types/ws_types';
+import { TWebsocketMessage, WsErrorCode, WsMessageType } from '../../../src/common_types/ws_types';
 import Cookies from 'js-cookie';
 import { SpotifyClient } from '../SpotifyClient';
 import {
@@ -25,7 +25,10 @@ function Room() {
     const [genres, setGenres] = useState<object>({});
 
     // TODO: Cache songs etc. in local storage
-
+    // TODO: "Attach" songs to genres by artist id
+    // TODO: Send data to websocket, wait for confirmation, then send next data
+    // TODO: Backoff-retry on spotify api calls
+    
     function addLikedSongs(songs: object, genres: object) {
         // TODO: Call this function when data received from websocket
         setLikedSongs((old) => {
@@ -131,9 +134,13 @@ function Room() {
     );
 
     useEffect(() => {
-        if (lastMessage) {
-            setLog((old) => old + '\n' + lastMessage.data);
-        }
+        if (!lastMessage) return;
+        
+        setLog((old) => old + '\n' + lastMessage.data);
+
+        const message: TWebsocketMessage = JSON.parse(lastMessage.data);
+        if(message.type == WsMessageType.ReadyNotification) console.log('Ready!');
+
     }, [lastMessage]);
 
     return (
@@ -141,7 +148,7 @@ function Room() {
             <div className='content'>
                 <button
                     onClick={() =>
-                        sendMessage(`ping (${new Date().toLocaleTimeString()})`)
+                        sendMessage(JSON.stringify({ type: WsMessageType.Ping, data: null }))
                     }
                 >
                     Send ping
@@ -153,6 +160,7 @@ function Room() {
                 <p>{link}</p>
                 <hr />
                 <pre>{log}</pre>
+                <hr />
                 <ProfileSummary userProfile={userProfile} />
                 {Object.entries(genres).map(([key, value]) => (
                     <div key={key}>{JSON.stringify(value)} ({key})</div>

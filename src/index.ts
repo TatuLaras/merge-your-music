@@ -2,7 +2,11 @@ import { FakeStoreService } from './FakeStoreService';
 import { Spotify } from './Spotify';
 import { StoreService } from './StoreService';
 import { randomString } from './helpers';
-import { WsErrorCode } from './common_types/ws_types';
+import {
+    TWebsocketMessage,
+    WsErrorCode,
+    WsMessageType,
+} from './common_types/ws_types';
 
 var cors = require('cors');
 
@@ -55,6 +59,16 @@ app.ws('/:id', function (ws: any, req: any) {
     }
 
     room.connections.push(ws);
+    if (room.connections.length == 2) {
+        room?.connections.forEach((client: any) =>
+            client.send(
+                JSON.stringify({
+                    type: WsMessageType.ReadyNotification,
+                    data: null,
+                } as TWebsocketMessage)
+            )
+        );
+    }
 
     console.log(
         `[${roomId}] Open: ${room.connections.length} clients connected.`
@@ -64,7 +78,7 @@ app.ws('/:id', function (ws: any, req: any) {
         console.log(`[${req.params.id}] Received: ${msg}`);
         room?.connections.forEach((client: any) => {
             if (client == ws) return;
-            client.send(`[${req.params.id}] ${msg}`);
+            client.send(msg);
         });
     });
     ws.on('close', function () {
