@@ -1,4 +1,4 @@
-# Spotifuse
+# Merge Your Music
 
 A webapp for generating playlists that incorporate your music taste with someone else's.
 
