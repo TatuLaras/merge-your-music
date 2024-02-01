@@ -1,15 +1,24 @@
 import {
+    TGenreMapping,
+    reduceToSongInfo,
+    TSongInfoCollection,
     TSpotifyAuthInfo,
     TSpotifyResponse,
     TSpotifyTrack,
-    // TSpotifyImage,
     TSpotifyUser,
 } from '../../src/common_types/spotify_types';
+import { sleep } from './helpers';
 
 export class SpotifyClient {
     readonly baseUrl = 'https://api.spotify.com/v1';
     readonly authInfo: TSpotifyAuthInfo;
     readonly invalidTokenCallback: () => void;
+    private shouldAbort = false;
+    private abortedCallback: () => void = () => {};
+    private _jobRunning = false;
+    public get jobRunning() {
+        return this._jobRunning;
+    }
 
     constructor(authInfo: TSpotifyAuthInfo, invalidTokenCallback: () => void) {
         this.authInfo = authInfo;
@@ -17,11 +26,19 @@ export class SpotifyClient {
     }
 
     async fetch<T>(url: string, options?: RequestInit): Promise<T> {
-        const response = await fetch(url, options);
+        let response = await fetch(url, options);
         if (response.status === 401) {
             this.invalidTokenCallback();
             return Promise.reject('Invalid token');
         }
+
+        while (response.status === 429) {
+            let retryAfter = response.headers.get('Retry-After');
+            if (!retryAfter) retryAfter = '10';
+            await sleep(parseInt(retryAfter) * 1000);
+            response = await fetch(url, options);
+        }
+
         return response.json();
     }
 
@@ -39,41 +56,70 @@ export class SpotifyClient {
 
     async getMeTracks(): Promise<TSpotifyResponse<TSpotifyTrack>> {
         return this.get<TSpotifyResponse<TSpotifyTrack>>(
-            `${this.baseUrl}/me/tracks`
+            `${this.baseUrl}/me/tracks`,
         );
     }
 
     async loadAllMeTracks(
-        newDataCallback: (songs: object, genres: object) => void
+        newDataCallback: (
+            songs: TSongInfoCollection,
+            genres: TGenreMapping,
+        ) => void,
+        finalCallback: () => void,
+        setFetchedSongCount: any,
+        setTotalSongCount: any,
     ) {
+        this._jobRunning = true;
         let nextUrl = `${this.baseUrl}/me/tracks?limit=50`;
         while (nextUrl) {
+            if (this.shouldAbort) {
+                console.log(`Aborting loadAllMeTracks`);
+                this.shouldAbort = false;
+                this.abortedCallback();
+                return;
+            }
+
             const response =
                 await this.get<TSpotifyResponse<TSpotifyTrack>>(nextUrl);
-            console.log(response);
 
-            const songs: any = {};
+            setTotalSongCount(response.total);
+
+            const songs: TSongInfoCollection = {};
+            const genres: TGenreMapping = {};
+
             const artistIdList: string[] = [];
-            const genres: any = {};
 
             response.items.forEach((item) => {
-                songs[item.track.id] = item.track.name;
+                if (item.track.is_local) return;
+
+                songs[item.track.id] = reduceToSongInfo(item);
+
                 if (artistIdList.length < 50)
                     artistIdList.push(item.track.artists[0].id);
             });
 
             const artistIdStr = artistIdList.join(',');
             const artistResponse = await this.get<any>(
-                `${this.baseUrl}/artists?ids=${artistIdStr}`
+                `${this.baseUrl}/artists?ids=${artistIdStr}`,
             );
 
             artistResponse.artists.forEach((artist: any) => {
-                if(artist.genres.length == 0) return
+                if (artist.genres.length == 0) return;
                 genres[artist.id] = artist.genres;
             });
 
-            newDataCallback(songs, genres);
+            await newDataCallback(songs, genres);
+            setFetchedSongCount((old: any) => old + response.items.length);
             nextUrl = response.next;
         }
+        finalCallback();
+    }
+
+    async abort(): Promise<void> {
+        this.shouldAbort = true;
+        this._jobRunning = false;
+        return new Promise((resolve) => {
+            this.abortedCallback = resolve;
+        });
     }
 }

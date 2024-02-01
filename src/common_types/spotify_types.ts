@@ -12,13 +12,13 @@ export interface TSpotifyImage {
 export interface TSpotifyUser {
     display_name: string;
     id: string;
-    images: Array<TSpotifyImage>;
+    images: TSpotifyImage[];
     external_urls: { spotify: string };
 }
 
 export interface TSpotifyResponse<T> {
     href: string;
-    items: Array<T>;
+    items: T[];
     limit: number;
     next: string;
     offset: number;
@@ -33,8 +33,8 @@ export interface TSpotifyTrack {
 
 export interface TSpotifyTrackInfo {
     album: TSpotifyAlbum;
-    artists: Array<TSpotifyArtistShort>;
-    available_markets: Array<string>;
+    artists: TSpotifyArtistShort[];
+    available_markets: string[];
     disc_number: number;
     duration_ms: number;
     explicit: boolean;
@@ -53,12 +53,12 @@ export interface TSpotifyTrackInfo {
 
 export interface TSpotifyAlbum {
     album_type: string;
-    artists: Array<TSpotifyArtistShort>;
-    available_markets: Array<string>;
+    artists: TSpotifyArtistShort[];
+    available_markets: string[];
     external_urls: { spotify: string };
     href: string;
     id: string;
-    images: Array<TSpotifyImage>;
+    images: TSpotifyImage[];
     name: string;
     release_date: string;
     release_date_precision: string;
@@ -78,12 +78,69 @@ export interface TSpotifyArtistShort {
 
 export interface TSpotifyArtist extends TSpotifyArtistShort {
     followers: { href: string; total: number };
-    genres: Array<string>;
-    images: Array<TSpotifyImage>;
+    genres: string[];
+    images: TSpotifyImage[];
     popularity: number;
 }
 
-export interface TSongData {
+export interface TAlbumInfo {
     name: string;
-    artist: string;
+    release_date: string;
+    image: string;
+    id: string;
+    external_url: string;
+    artists: TArtistInfo[];
+}
+
+export interface TArtistInfo {
+    name: string;
+    external_url: string;
+    id: string;
+}
+
+// More minimal version of TrackInfo, for space efficiency
+export interface TSongInfo {
+    name: string;
+    artists: TArtistInfo[];
+    duration_ms: number;
+    external_url: string;
+    preview_url: string;
+    album: TAlbumInfo;
+}
+
+export interface TSongInfoCollection {
+    [songId: string]: TSongInfo;
+}
+export interface TGenreMapping {
+    [artistId: string]: string[];
+}
+
+export function reduceToSongInfo(item: TSpotifyTrack): TSongInfo {
+    return {
+        name: item.track.name,
+        artists: item.track.artists.map((artist) => {
+            return {
+                name: artist.name,
+                id: artist.id,
+                external_url: artist.external_urls.spotify,
+            };
+        }),
+        duration_ms: item.track.duration_ms,
+        external_url: item.track.external_urls.spotify,
+        preview_url: item.track.preview_url,
+        album: {
+            name: item.track.album.name,
+            release_date: item.track.album.release_date,
+            image: item.track.album.images[0].url,
+            id: item.track.album.id,
+            external_url: item.track.album.external_urls.spotify,
+            artists: item.track.album.artists.map((artist) => {
+                return {
+                    name: artist.name,
+                    id: artist.id,
+                    external_url: artist.external_urls.spotify,
+                };
+            }),
+        },
+    } as TSongInfo;
 }

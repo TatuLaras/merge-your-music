@@ -3,6 +3,7 @@ import { Spotify } from './Spotify';
 import { StoreService } from './StoreService';
 import { randomString } from './helpers';
 import {
+    TWebsocketDataPacket,
     TWebsocketMessage,
     WsErrorCode,
     WsMessageType,
@@ -63,7 +64,7 @@ app.ws('/:id', function (ws: any, req: any) {
         room?.connections.forEach((client: any) =>
             client.send(
                 JSON.stringify({
-                    type: WsMessageType.ReadyNotification,
+                    type: WsMessageType.Ready,
                     data: null,
                 } as TWebsocketMessage)
             )
@@ -74,8 +75,11 @@ app.ws('/:id', function (ws: any, req: any) {
         `[${roomId}] Open: ${room.connections.length} clients connected.`
     );
 
-    ws.on('message', function (msg: any) {
-        console.log(`[${req.params.id}] Received: ${msg}`);
+    ws.on('message', function (msg: string) {
+        const msgData: TWebsocketMessage = JSON.parse(msg);
+        if (msgData.type == WsMessageType.Data)
+            console.log(new Date().toTimeString() + ' received data');
+
         room?.connections.forEach((client: any) => {
             if (client == ws) return;
             client.send(msg);

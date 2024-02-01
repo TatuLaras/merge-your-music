@@ -9,12 +9,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@jseda/useworker": "^5.0.0",
     "@tanstack/react-router": "^1.14.0",
     "commonjs": "^0.0.1",
     "js-cookie": "^3.0.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-use-websocket": "^4.5.0"
+    "react-use-websocket": "^4.5.0",
+    "zipson": "^0.2.12"
   },
   "devDependencies": {
     "@tanstack/router-devtools": "^1.14.0",
