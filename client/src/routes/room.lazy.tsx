@@ -8,22 +8,22 @@ import {
     WsMessageType,
     sendAbort,
     sendData,
-    sendDataReceivedConfirmation,
 } from '../../../src/common_types/ws_types';
 import Cookies from 'js-cookie';
 import { SpotifyClient } from '../SpotifyClient';
 import {
     TSpotifyAuthInfo,
-    TSpotifyUser,
     TSongInfoCollection,
     TGenreMapping,
+    TMusicData,
 } from '../../../src/common_types/spotify_types';
-import { ProfileSummary } from '../components/ProfileSummary';
-// import { stringify, parse } from 'zipson';
+import { stringify, parse } from 'zipson';
+
 import { LikedSongsLoading } from '../components/LikedSongsLoading';
+import { Results } from '../components/Results';
+import { QuitButton } from '../components/QuitButton';
 
 import '../css/room.css';
-
 
 export const Route = createLazyFileRoute('/room')({
     component: Room,
@@ -32,16 +32,48 @@ export const Route = createLazyFileRoute('/room')({
 function Room() {
     const [link, setLink] = useState('Connecting...');
     const [roomId, setRoomID] = useState('');
-    const [log, setLog] = useState('');
-    const [userProfile, setUserProfile] = useState<TSpotifyUser | null>(null);
-    const [bothReady, setBothReady] = useState<boolean>(false);
     const [selfDone, setSelfDone] = useState<boolean>(false);
     const [otherDone, setOtherDone] = useState<boolean>(false);
     const [spotifyClient, setSpotifyClient] = useState<SpotifyClient | null>(
         null,
     );
-    const [likedSongs, setLikedSongs] = useState<object>({});
-    const [genres, setGenres] = useState<object>({});
+    const [likedSongs, setLikedSongs] = useState<TSongInfoCollection>({});
+    const [genres, setGenres] = useState<TGenreMapping>({});
+    const [readyToSync, setReadyToSync] = useState<boolean>(false);
+    const [stage, setStage] = useState<'waiting' | 'sync' | 'display'>(
+        'waiting',
+    );
+
+    useEffect(() => {
+        // Check for cached music data, if found, use it
+        const compressed = localStorage.getItem('musicData');
+        if (compressed) {
+            console.log('Found cached music data');
+            const musicData = parse(compressed) as TMusicData;
+            setLikedSongs(musicData.songs);
+            setGenres(musicData.genres);
+            setStage('display');
+        }
+
+        getRoomId();
+
+        // Get Spotify auth info from cookies, redirect to login if none
+        const tokens = Cookies.get('own_tokens');
+        if (!tokens)
+            window.location.replace(
+                'http://localhost:5000/spotify_login/initial',
+            );
+        const authInfo: TSpotifyAuthInfo = JSON.parse(tokens!);
+        setSpotifyClient(
+            new SpotifyClient(authInfo, () => {
+                // Invalid token handler
+                Cookies.remove('own_tokens');
+                window.location.replace(
+                    'http://localhost:5000/spotify_login/initial',
+                );
+            }),
+        );
+    }, []);
 
     async function addLikedSongs(
         songs: TSongInfoCollection,
@@ -64,20 +96,6 @@ function Room() {
             };
         });
     }
-
-    useEffect(() => {
-        getRoomId();
-        const tokens = Cookies.get('own_tokens');
-        if (!tokens) window.location.replace('/');
-        const authInfo: TSpotifyAuthInfo = JSON.parse(tokens!);
-        setSpotifyClient(
-            new SpotifyClient(authInfo, () => {
-                // Invalid token handler
-                Cookies.remove('own_tokens');
-                window.location.replace('/');
-            }),
-        );
-    }, []);
 
     window.onbeforeunload = () => sendAbort(sendMessage);
 
@@ -120,26 +138,16 @@ function Room() {
     }
 
     async function doneWithAllData() {
-        console.log(`Done with all data`);
-
-        // // store compressed data to local storage
-        // const compressed = stringify({songs: likedSongs, genres: genres});
-        // try {
-        //     localStorage.setItem('musicData', compressed);
-        // } catch (e) {
-        //     console.log('Could not cache the music data.');
-        // }
-    }
-
-    function getProfile() {
-        if (!spotifyClient) {
-            alert('no spotify client!');
-            return;
+        // Cache songs etc. in local storage
+        const musicData: TMusicData = { songs: likedSongs, genres: genres };
+        const compressed = stringify(musicData as any);
+        try {
+            localStorage.setItem('musicData', compressed);
+        } catch (e) {
+            console.log('Could not cache the music data.');
         }
 
-        spotifyClient.getMe().then((profile) => {
-            if (profile) setUserProfile(profile);
-        });
+        setStage('display');
     }
 
     function onClose(event: CloseEvent) {
@@ -167,7 +175,6 @@ function Room() {
         'ws://localhost:5000/' + roomId,
         {
             onOpen: () => {
-                setLog('');
                 setLink('http://localhost:5000/share/' + roomId);
             },
             onClose: onClose,
@@ -185,16 +192,15 @@ function Room() {
             case WsMessageType.Data:
                 const data = message.data as TWebsocketDataPacket;
                 addLikedSongs(data.songs, data.genres, false);
-                sendDataReceivedConfirmation(sendMessage);
-                break;
-
-            case WsMessageType.Ping:
-                console.log('Received ping');
                 break;
 
             case WsMessageType.Ready:
                 console.log('Received ready notification');
-                setBothReady(true);
+                setStage((old) => {
+                    if (old === 'display') return old;
+                    return 'sync';
+                });
+                setReadyToSync(true);
                 break;
 
             case WsMessageType.DataDone:
@@ -202,12 +208,8 @@ function Room() {
                 console.log(`Received data confirmation`);
                 break;
 
-            case WsMessageType.DataReceived:
-                console.log(`Received data received confirmation`);
-                break;
-
             case WsMessageType.Abort:
-                location.reload();
+                if (stage === 'sync') location.reload();
                 break;
 
             default:
@@ -215,52 +217,43 @@ function Room() {
         }
     }, [lastMessage]);
 
-    return (
-        <div className='wrapper' id='room'>
-            <div className='content'>
-                <button
-                    onClick={() =>
-                        sendMessage(
-                            JSON.stringify({
-                                type: WsMessageType.Ping,
-                                data: null,
-                            }),
-                        )
-                    }
-                >
-                    Send ping
-                </button>
-                <button onClick={getProfile}>Get profile</button>
-                <button
-                    onClick={() =>
-                        spotifyClient!
-                            .abort()
-                            .then(() => console.log('Aborted'))
-                    }
-                >
-                    Abort
-                </button>
-                <hr />
+    useEffect(() => {
+        console.log(`Stage changed to ${stage}`);
+    }, [stage]);
+
+    const pageContentInStage = {
+        waiting: (
+            <div className='link'>
                 <p>Send this link to someone:</p>
                 <p>{link}</p>
-                <hr />
-                <pre>{log}</pre>
-                <hr />
-                <ProfileSummary userProfile={userProfile} />
+            </div>
+        ),
+        sync: (
+            <>
+                <QuitButton />
                 <LikedSongsLoading
                     spotifyClient={spotifyClient}
-                    bothReady={bothReady}
+                    readyToSync={readyToSync}
                     doneCallback={doneWithOwnData}
                     addLikedSongsCallback={addLikedSongs}
                 />
-                {/* {Object.entries(genres).map(([key, value]) => (
-                    <div key={key}>
-                        {JSON.stringify(value)} ({key})
-                    </div>
-                ))}
-                <hr />
-                {JSON.stringify(likedSongs)} */}
-            </div>
+            </>
+        ),
+        display: (
+            <>
+                <QuitButton />
+                <Results
+                    musicData={
+                        { songs: likedSongs, genres: genres } as TMusicData
+                    }
+                />
+            </>
+        ),
+    };
+
+    return (
+        <div className='wrapper' id='room'>
+            <div className='content'>{pageContentInStage[stage]}</div>
         </div>
     );
 }

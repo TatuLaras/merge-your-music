@@ -7,12 +7,12 @@ import {
 
 export function LikedSongsLoading({
     spotifyClient,
-    bothReady,
+    readyToSync,
     doneCallback,
     addLikedSongsCallback,
 }: {
     spotifyClient: SpotifyClient | null;
-    bothReady: boolean;
+    readyToSync: boolean;
     doneCallback: () => void;
     addLikedSongsCallback: (
         songs: TSongInfoCollection,
@@ -39,10 +39,10 @@ export function LikedSongsLoading({
     }
 
     useEffect(() => {
-        if (bothReady) getLikedSongs();
-    }, [bothReady]);
+        if (readyToSync) getLikedSongs();
+    }, [readyToSync]);
 
-    const text = bothReady ? 'Ready' : 'Not ready';
+    const text = readyToSync ? 'Sending data...' : 'Waiting for other user...';
     const loadingBarWidth = (fetchedSongCount / totalSongCount) * 100;
     const loadingBarStyle = {
         '--loading-bar-width': loadingBarWidth + '%',

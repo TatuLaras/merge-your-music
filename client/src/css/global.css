@@ -2,11 +2,20 @@
 :root {
     font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     --dogwood-rose: #cc3363ff;
-    --russian-violet: #20063bff;
+    --russian-violet-dark: #140d1d;
+    --russian-violet: #2d0853;
+    --russian-violet-light: #3e0c70;
     --carolina-blue: #84acceff;
     --olivine: #a8c686ff;
     --pear: #d1d646ff;
     --light-gray: #e8e8e8ff;
+    --scrollbar-width: 5px;
+}
+
+body {
+    background-color: var(--russian-violet-dark);
+    color: white;
+    min-width: 0;
 }
 
 h1 {
@@ -14,8 +23,7 @@ h1 {
     font-weight: 600;
 }
 
-h2
-{
+h2 {
     font-size: 2.4rem;
     font-weight: 600;
 }
@@ -26,4 +34,46 @@ p {
 
 .content {
     padding: 2rem;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: var(--scrollbar-width);
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #00000000;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--dogwood-rose);
+    border-radius: 2px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.quit-button {
+    background-color: var(--russian-violet);
+    width: fit-content;
+    padding: 1rem;
+    font-weight: 600;
+    border-radius: 1rem;
+    cursor: pointer;
+    transition:
+        transform 0.1s ease-out,
+        background-color 0.1s ease-out;
+}
+
+.quit-button:hover {
+    background-color: var(--russian-violet-light);
+    transform: translateY(-2px);
 }

@@ -1,6 +1,5 @@
 import {
     TGenreMapping,
-    reduceToSongInfo,
     TSongInfoCollection,
     TSpotifyAuthInfo,
     TSpotifyResponse,
@@ -8,6 +7,7 @@ import {
     TSpotifyUser,
 } from '../../src/common_types/spotify_types';
 import { sleep } from './helpers';
+import { reduceToSongInfo } from './spotify_helpers';
 
 export class SpotifyClient {
     readonly baseUrl = 'https://api.spotify.com/v1';
@@ -27,6 +27,8 @@ export class SpotifyClient {
 
     async fetch<T>(url: string, options?: RequestInit): Promise<T> {
         let response = await fetch(url, options);
+        console.log(`Spotify fetch: ${url}`);
+        
         if (response.status === 401) {
             this.invalidTokenCallback();
             return Promise.reject('Invalid token');
@@ -60,6 +62,8 @@ export class SpotifyClient {
         );
     }
 
+    private lock: boolean = false;
+
     async loadAllMeTracks(
         newDataCallback: (
             songs: TSongInfoCollection,
@@ -69,6 +73,10 @@ export class SpotifyClient {
         setFetchedSongCount: any,
         setTotalSongCount: any,
     ) {
+        if(this.lock) return;
+        this.lock = true;
+        console.log('moi');
+        
         this._jobRunning = true;
         let nextUrl = `${this.baseUrl}/me/tracks?limit=50`;
         while (nextUrl) {

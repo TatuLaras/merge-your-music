@@ -1,10 +1,11 @@
 #room .songs-loading-status .loading-bar {
     --border-radius: 6px;
+    --padding: 2px;
 
-    background-color: var(--light-gray);
+    background-color: var(--russian-violet);
     height: 1rem;
     width: 100%;
-    padding: 2px;
+    padding: var(--padding);
     margin-top: 10px;
     border-radius: var(--border-radius);
     display: flex;
@@ -15,6 +16,49 @@
     background-color: var(--dogwood-rose);
     height: 100%;
     width: var(--loading-bar-width);
-    border-radius: calc(var(--border-radius) - 2px);
+    border-radius: calc(var(--border-radius) - var(--padding));
     transition: width 0.5s ease-out;
+}
+
+#room .genres {
+    display: grid;
+    grid-template-columns: repeat( auto-fit, minmax(13rem, 1fr) );
+    margin-top: 2rem;
+}
+
+#room .playlist-card {
+    --border-radius: 10px;
+    padding: 0.8rem;
+    margin: 0.5rem;
+    background-color: var(--russian-violet);
+    color: white;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition:
+        transform 0.1s ease-out,
+        background-color 0.1s ease-out;
+    user-select: none;
+}
+
+#room .playlist-card:hover {
+    transform: translateY(-5px);
+    background-color: var(--russian-violet-light);
+}
+
+#room .playlist-card img {
+    width: 100%;
+    border-radius: calc(var(--border-radius) / 2);
+}
+
+#room .playlist-card .title {
+    font-weight: 600;
+    margin-top: 0.6rem;
+    word-wrap: break-word;
+}
+
+#room .playlist-card .extra-info {
+    margin-top: 0.4rem;
+    word-wrap: break-word;
+    opacity: 0.5;
+    font-size: 0.9rem;
 }
