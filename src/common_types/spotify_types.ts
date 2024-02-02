@@ -115,32 +115,12 @@ export interface TGenreMapping {
     [artistId: string]: string[];
 }
 
-export function reduceToSongInfo(item: TSpotifyTrack): TSongInfo {
-    return {
-        name: item.track.name,
-        artists: item.track.artists.map((artist) => {
-            return {
-                name: artist.name,
-                id: artist.id,
-                external_url: artist.external_urls.spotify,
-            };
-        }),
-        duration_ms: item.track.duration_ms,
-        external_url: item.track.external_urls.spotify,
-        preview_url: item.track.preview_url,
-        album: {
-            name: item.track.album.name,
-            release_date: item.track.album.release_date,
-            image: item.track.album.images[0].url,
-            id: item.track.album.id,
-            external_url: item.track.album.external_urls.spotify,
-            artists: item.track.album.artists.map((artist) => {
-                return {
-                    name: artist.name,
-                    id: artist.id,
-                    external_url: artist.external_urls.spotify,
-                };
-            }),
-        },
-    } as TSongInfo;
+export interface TMusicData {
+    songs: TSongInfoCollection;
+    genres: TGenreMapping;
+}
+
+export interface TGenrePlaylist {
+    genre: string;
+    list: TSongInfo[];
 }

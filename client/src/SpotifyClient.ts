@@ -1,12 +1,13 @@
 import {
     TGenreMapping,
+    TGenrePlaylist,
     TSongInfoCollection,
     TSpotifyAuthInfo,
     TSpotifyResponse,
     TSpotifyTrack,
     TSpotifyUser,
 } from '../../src/common_types/spotify_types';
-import { sleep } from './helpers';
+import { sleep, capitalize } from './helpers';
 import { reduceToSongInfo } from './spotify_helpers';
 
 export class SpotifyClient {
@@ -15,10 +16,6 @@ export class SpotifyClient {
     readonly invalidTokenCallback: () => void;
     private shouldAbort = false;
     private abortedCallback: () => void = () => {};
-    private _jobRunning = false;
-    public get jobRunning() {
-        return this._jobRunning;
-    }
 
     constructor(authInfo: TSpotifyAuthInfo, invalidTokenCallback: () => void) {
         this.authInfo = authInfo;
@@ -41,7 +38,11 @@ export class SpotifyClient {
             response = await fetch(url, options);
         }
 
-        return response.json();
+        if(response.status == 200 || response.status == 201) 
+            return response.json();
+
+        return Promise.reject('Error with Spotify Api');
+        
     }
 
     async get<T>(url: string): Promise<T> {
@@ -49,6 +50,18 @@ export class SpotifyClient {
             headers: {
                 Authorization: `Bearer ${this.authInfo.access_token}`,
             },
+        });
+    }
+
+    async post<T>(url: string, data: any): Promise<T> {
+        return this.fetch<T>(url, {
+            method: "POST",
+            headers:
+            {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${this.authInfo.access_token}`,
+            },
+            body: JSON.stringify(data)
         });
     }
 
@@ -75,9 +88,9 @@ export class SpotifyClient {
     ) {
         if(this.lock) return;
         this.lock = true;
+
         console.log('moi');
         
-        this._jobRunning = true;
         let nextUrl = `${this.baseUrl}/me/tracks?limit=50`;
         while (nextUrl) {
             if (this.shouldAbort) {
@@ -123,11 +136,19 @@ export class SpotifyClient {
         finalCallback();
     }
 
-    async abort(): Promise<void> {
-        this.shouldAbort = true;
-        this._jobRunning = false;
-        return new Promise((resolve) => {
-            this.abortedCallback = resolve;
-        });
+    async createPlaylist(playlist: TGenrePlaylist) {
+        const name = capitalize(playlist.genre);
+        const userProfile = await this.getMe();
+        const url = `${this.baseUrl}/users/${userProfile.id}/playlists`;
+        const postBody = {
+            name: name,
+            description: "Exported from Merge Your Music",
+            public: true
+        };
+        await this.post<any>(url, postBody);
+
+        // Add tracks ...
+        
     }
+
 }

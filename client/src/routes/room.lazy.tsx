@@ -17,10 +17,9 @@ import {
     TGenreMapping,
     TMusicData,
 } from '../../../src/common_types/spotify_types';
-import { stringify, parse } from 'zipson';
+import { stringify } from 'zipson';
 
 import { LikedSongsLoading } from '../components/LikedSongsLoading';
-import { Results } from '../components/Results';
 import { QuitButton } from '../components/QuitButton';
 
 import '../css/room.css';
@@ -40,19 +39,14 @@ function Room() {
     const [likedSongs, setLikedSongs] = useState<TSongInfoCollection>({});
     const [genres, setGenres] = useState<TGenreMapping>({});
     const [readyToSync, setReadyToSync] = useState<boolean>(false);
-    const [stage, setStage] = useState<'waiting' | 'sync' | 'display'>(
-        'waiting',
-    );
+    const [stage, setStage] = useState<'waiting' | 'sync'>('waiting');
 
     useEffect(() => {
         // Check for cached music data, if found, use it
         const compressed = localStorage.getItem('musicData');
         if (compressed) {
-            console.log('Found cached music data');
-            const musicData = parse(compressed) as TMusicData;
-            setLikedSongs(musicData.songs);
-            setGenres(musicData.genres);
-            setStage('display');
+            window.location.replace('/results');
+            return;
         }
 
         getRoomId();
@@ -145,9 +139,10 @@ function Room() {
             localStorage.setItem('musicData', compressed);
         } catch (e) {
             console.log('Could not cache the music data.');
+            return;
         }
 
-        setStage('display');
+        window.location.replace('/results');
     }
 
     function onClose(event: CloseEvent) {
@@ -196,10 +191,7 @@ function Room() {
 
             case WsMessageType.Ready:
                 console.log('Received ready notification');
-                setStage((old) => {
-                    if (old === 'display') return old;
-                    return 'sync';
-                });
+                setStage('sync');
                 setReadyToSync(true);
                 break;
 
@@ -236,16 +228,6 @@ function Room() {
                     readyToSync={readyToSync}
                     doneCallback={doneWithOwnData}
                     addLikedSongsCallback={addLikedSongs}
-                />
-            </>
-        ),
-        display: (
-            <>
-                <QuitButton />
-                <Results
-                    musicData={
-                        { songs: likedSongs, genres: genres } as TMusicData
-                    }
                 />
             </>
         ),

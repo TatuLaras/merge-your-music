@@ -5,7 +5,7 @@ export function randomString(lenght: number): string {
     const charactersLength = characters.length;
     for (let i = 0; i < lenght; i++) {
         result += characters.charAt(
-            Math.floor(Math.random() * charactersLength)
+            Math.floor(Math.random() * charactersLength),
         );
     }
     return result;

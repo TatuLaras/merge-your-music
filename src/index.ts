@@ -8,6 +8,7 @@ import {
     WsErrorCode,
     WsMessageType,
 } from './common_types/ws_types';
+const fs = require('fs');
 
 var cors = require('cors');
 
@@ -31,7 +32,7 @@ app.use(
         secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: true,
-    })
+    }),
 );
 
 interface TRoom {
@@ -66,20 +67,16 @@ app.ws('/:id', function (ws: any, req: any) {
                 JSON.stringify({
                     type: WsMessageType.Ready,
                     data: null,
-                } as TWebsocketMessage)
-            )
+                } as TWebsocketMessage),
+            ),
         );
     }
 
     console.log(
-        `[${roomId}] Open: ${room.connections.length} clients connected.`
+        `[${roomId}] Open: ${room.connections.length} clients connected.`,
     );
 
     ws.on('message', function (msg: string) {
-        const msgData: TWebsocketMessage = JSON.parse(msg);
-        if (msgData.type == WsMessageType.Data)
-            console.log(new Date().toTimeString() + ' received data');
-
         room?.connections.forEach((client: any) => {
             if (client == ws) return;
             client.send(msg);
@@ -88,7 +85,7 @@ app.ws('/:id', function (ws: any, req: any) {
     ws.on('close', function () {
         room.connections = room.connections.filter((conn) => conn != ws);
         console.log(
-            `[${roomId}] Close: ${room.connections.length} clients connected.`
+            `[${roomId}] Close: ${room.connections.length} clients connected.`,
         );
     });
 });
@@ -124,7 +121,7 @@ app.get(
 
         let token = await spotify.getAccessToken(
             code!,
-            process.env.SPOTIFY_REDIRECT_URI_INITIAL!
+            process.env.SPOTIFY_REDIRECT_URI_INITIAL!,
         );
 
         if (!token) {
@@ -135,7 +132,7 @@ app.get(
 
         res.cookie('own_tokens', JSON.stringify(token));
         res.redirect(process.env.FINAL_REDIRECT_URI_INITIAL);
-    })
+    }),
 );
 
 app.post('/new_room', (req: any, res: any) => {
@@ -146,7 +143,6 @@ app.post('/new_room', (req: any, res: any) => {
     }
 
     openConnections.set(room_id, { created: new Date(), connections: [] });
-    console.log(openConnections);
     res.send(room_id);
 
     cleanupRoomIds();

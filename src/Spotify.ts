@@ -3,7 +3,8 @@ import { TSpotifyAuthInfo } from './common_types/spotify_types';
 export class Spotify {
     getLoginUrl(redirect_uri: string): string | null {
         var scope: string =
-            'user-read-private user-read-email user-library-read';
+            'user-read-private user-read-email user-library-read \
+playlist-modify-public playlist-modify-private';
 
         const data: any = {
             response_type: 'code',
@@ -20,7 +21,7 @@ export class Spotify {
 
     async getAccessToken(
         code: string,
-        redirect_uri: string
+        redirect_uri: string,
     ): Promise<TSpotifyAuthInfo | null> {
         const data = {
             code: code,
@@ -31,7 +32,7 @@ export class Spotify {
         const basic = btoa(
             process.env.SPOTIFY_CLIENT_ID +
                 ':' +
-                process.env.SPOTIFY_CLIENT_SECRET
+                process.env.SPOTIFY_CLIENT_SECRET,
         );
 
         const response = await fetch('https://accounts.spotify.com/api/token', {

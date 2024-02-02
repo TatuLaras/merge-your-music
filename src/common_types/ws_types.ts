@@ -10,10 +10,8 @@ export enum WsErrorCode {
 export enum WsMessageType {
     Ready,
     DataDone,
-    DataReceived,
     Abort,
     Data,
-    Ping,
 }
 
 export interface TWebsocketMessage {
@@ -33,16 +31,6 @@ export function sendData(
     const message: TWebsocketMessage = {
         type: WsMessageType.Data,
         data: data,
-    };
-    sendMessage(JSON.stringify(message));
-}
-
-export function sendDataReceivedConfirmation(
-    sendMessage: (msg: string) => void
-) {
-    const message: TWebsocketMessage = {
-        type: WsMessageType.DataReceived,
-        data: null,
     };
     sendMessage(JSON.stringify(message));
 }
