@@ -12,7 +12,7 @@ import {
 import Cookies from 'js-cookie';
 import { SpotifyClient } from '../SpotifyClient';
 import {
-    TSpotifyAuthInfo,
+    Spotify,
     TSongInfoCollection,
     TGenreMapping,
     TMusicData,
@@ -53,15 +53,15 @@ function Room() {
         const tokens = Cookies.get('own_tokens');
         if (!tokens)
             window.location.replace(
-                'http://localhost:5000/spotify_login/initial',
+                `${import.meta.env.VITE_BACKEND_BASE_URL}/spotify_login`,
             );
-        const authInfo: TSpotifyAuthInfo = JSON.parse(tokens!);
+        const authInfo: Spotify.AuthInfo = JSON.parse(tokens!);
         setSpotifyClient(
             new SpotifyClient(authInfo, () => {
                 // Invalid token handler
                 Cookies.remove('own_tokens');
                 window.location.replace(
-                    'http://localhost:5000/spotify_login/initial',
+                    `${import.meta.env.VITE_BACKEND_BASE_URL}/spotify_login`,
                 );
             }),
         );
@@ -112,7 +112,7 @@ function Room() {
             return;
         }
 
-        fetch('http://localhost:5000/new_room', {
+        fetch(`${import.meta.env.VITE_BACKEND_BASE_URL}/new_room`, {
             method: 'POST',
         })
             .then((res) => res.text())
@@ -165,10 +165,10 @@ function Room() {
 
     const { sendMessage, lastMessage /* , readyState */ } = useWebSocket(
         //, readyState
-        'ws://localhost:5000/' + roomId,
+        `${import.meta.env.VITE_BACKEND_WS_BASE}/` + roomId,
         {
             onOpen: () => {
-                setLink('http://localhost:5000/share/' + roomId);
+                setLink(`${import.meta.env.VITE_BACKEND_BASE_URL}/share/` + roomId);
             },
             onClose: onClose,
             shouldReconnect: () => true,

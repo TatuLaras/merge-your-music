@@ -1,23 +1,20 @@
 import {
+    Spotify,
     TGenreMapping,
     TGenrePlaylist,
     TSongInfoCollection,
-    TSpotifyAuthInfo,
-    TSpotifyResponse,
-    TSpotifyTrack,
-    TSpotifyUser,
 } from '../../src/common_types/spotify_types';
 import { sleep, capitalize } from './helpers';
 import { reduceToSongInfo } from './spotify_helpers';
 
 export class SpotifyClient {
     readonly baseUrl = 'https://api.spotify.com/v1';
-    readonly authInfo: TSpotifyAuthInfo;
+    readonly authInfo: Spotify.AuthInfo;
     readonly invalidTokenCallback: () => void;
     private shouldAbort = false;
     private abortedCallback: () => void = () => {};
 
-    constructor(authInfo: TSpotifyAuthInfo, invalidTokenCallback: () => void) {
+    constructor(authInfo: Spotify.AuthInfo, invalidTokenCallback: () => void) {
         this.authInfo = authInfo;
         this.invalidTokenCallback = invalidTokenCallback;
     }
@@ -65,12 +62,12 @@ export class SpotifyClient {
         });
     }
 
-    async getMe(): Promise<TSpotifyUser> {
-        return this.get<TSpotifyUser>(`${this.baseUrl}/me`);
+    async getMe(): Promise<Spotify.User> {
+        return this.get<Spotify.User>(`${this.baseUrl}/me`);
     }
 
-    async getMeTracks(): Promise<TSpotifyResponse<TSpotifyTrack>> {
-        return this.get<TSpotifyResponse<TSpotifyTrack>>(
+    async getMeTracks(): Promise<Spotify.Response<Spotify.Track>> {
+        return this.get<Spotify.Response<Spotify.Track>>(
             `${this.baseUrl}/me/tracks`,
         );
     }
@@ -101,7 +98,7 @@ export class SpotifyClient {
             }
 
             const response =
-                await this.get<TSpotifyResponse<TSpotifyTrack>>(nextUrl);
+                await this.get<Spotify.Response<Spotify.Track>>(nextUrl);
 
             setTotalSongCount(response.total);
 

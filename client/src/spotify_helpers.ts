@@ -1,14 +1,14 @@
 import {
+    Spotify,
     TGenrePlaylist,
     TMusicData,
     TSongInfo,
-    TSpotifyTrack,
 } from '../../src/common_types/spotify_types';
 
 import { shuffle } from './helpers'
 
 // Maps TSpotifyTrack to a simpler TSongInfo
-export function reduceToSongInfo(item: TSpotifyTrack): TSongInfo {
+export function reduceToSongInfo(item: Spotify.Track): TSongInfo {
     return {
         name: item.track.name,
         artists: item.track.artists.map((artist) => {

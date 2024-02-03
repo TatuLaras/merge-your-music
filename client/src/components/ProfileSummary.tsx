@@ -1,9 +1,9 @@
-import { TSpotifyUser } from '../../../src/common_types/spotify_types';
+import { Spotify } from '../../../src/common_types/spotify_types';
 
 export function ProfileSummary({
     userProfile,
 }: {
-    userProfile: TSpotifyUser | null;
+    userProfile: Spotify.User | null;
 }) {
     if (!userProfile) return null;
     return (

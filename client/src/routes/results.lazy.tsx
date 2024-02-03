@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import { SpotifyClient } from '../SpotifyClient';
 import {
-    TSpotifyAuthInfo,
+    Spotify,
     TMusicData,
     TGenrePlaylist,
 } from '../../../src/common_types/spotify_types';
@@ -56,15 +56,15 @@ function Results() {
         const tokens = Cookies.get('own_tokens');
         if (!tokens)
             window.location.replace(
-                'http://localhost:5000/spotify_login/initial',
+                `${import.meta.env.VITE_BACKEND_BASE_URL}/spotify_login`,
             );
-        const authInfo: TSpotifyAuthInfo = JSON.parse(tokens!);
+        const authInfo: Spotify.AuthInfo = JSON.parse(tokens!);
         setSpotifyClient(
             new SpotifyClient(authInfo, () => {
                 // Invalid token handler
                 Cookies.remove('own_tokens');
                 window.location.replace(
-                    'http://localhost:5000/spotify_login/initial',
+                    `${import.meta.env.VITE_BACKEND_BASE_URL}/spotify_login`,
                 );
             }),
         );

@@ -1,14 +1,10 @@
-import { FakeStoreService } from './FakeStoreService';
-import { Spotify } from './Spotify';
-import { StoreService } from './StoreService';
+import { SpotifyHelpers } from './SpotifyHelpers';
 import { randomString } from './helpers';
 import {
-    TWebsocketDataPacket,
     TWebsocketMessage,
     WsErrorCode,
     WsMessageType,
 } from './common_types/ws_types';
-const fs = require('fs');
 
 var cors = require('cors');
 
@@ -23,8 +19,7 @@ app.use(cors());
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 
-const store: StoreService = new FakeStoreService();
-const spotify: Spotify = new Spotify();
+const spotify: SpotifyHelpers = new SpotifyHelpers();
 
 app.use(cookieParser());
 app.use(
@@ -90,26 +85,13 @@ app.ws('/:id', function (ws: any, req: any) {
     });
 });
 
-app.get('/spotify_login/:type', (req: any, res: any) => {
-    let type = req.params.type;
-    if (type != 'initial' && type != 'second') {
-        res.status(404);
-        res.send('404 Not Found');
-        return;
-    }
-
-    const redirect_uri: string =
-        type == 'initial'
-            ? process.env.SPOTIFY_REDIRECT_URI_INITIAL!
-            : process.env.SPOTIFY_REDIRECT_URI_SECOND!;
-
-    const login_url = spotify.getLoginUrl(redirect_uri);
-
+app.get('/spotify_login', (req: any, res: any) => {
+    const login_url = spotify.getLoginUrl(process.env.SPOTIFY_REDIRECT_URI!);
     res.redirect(login_url);
 });
 
 app.get(
-    '/spotify_callback/initial',
+    '/spotify_callback',
     asyncHandler(async (req: any, res: any) => {
         let code: string | undefined = req.query.code;
         let state: string | undefined = req.query.state;
@@ -121,7 +103,7 @@ app.get(
 
         let token = await spotify.getAccessToken(
             code!,
-            process.env.SPOTIFY_REDIRECT_URI_INITIAL!,
+            process.env.SPOTIFY_REDIRECT_URI!,
         );
 
         if (!token) {
@@ -131,7 +113,7 @@ app.get(
         }
 
         res.cookie('own_tokens', JSON.stringify(token));
-        res.redirect(process.env.FINAL_REDIRECT_URI_INITIAL);
+        res.redirect(process.env.FINAL_REDIRECT_URI);
     }),
 );
 
@@ -157,11 +139,11 @@ app.get('/share/:id', (req: any, res: any) => {
     }
 
     res.cookie('room_id', roomId);
-    res.redirect('/spotify_login/initial');
+    res.redirect('/spotify_login');
 });
 
-app.listen(process.env.BACKEND_PORT, () => {
-    console.log(`Spotifuse listening on port ${process.env.BACKEND_PORT}`);
+app.listen(process.env.PORT, () => {
+    console.log(`Spotifuse listening on port ${process.env.PORT}`);
 });
 
 function cleanupRoomIds() {

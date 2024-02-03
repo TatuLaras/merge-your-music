@@ -1,6 +1,10 @@
 .env
 build/*
 
+*.css
+*.css.map
+*.js
+
 # Logs
 *.log
 npm-debug.log*

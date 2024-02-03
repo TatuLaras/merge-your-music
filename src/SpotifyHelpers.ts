@@ -1,6 +1,6 @@
-import { TSpotifyAuthInfo } from './common_types/spotify_types';
+import { Spotify } from './common_types/spotify_types';
 
-export class Spotify {
+export class SpotifyHelpers {
     getLoginUrl(redirect_uri: string): string | null {
         var scope: string =
             'user-read-private user-read-email user-library-read \
@@ -22,7 +22,7 @@ playlist-modify-public playlist-modify-private';
     async getAccessToken(
         code: string,
         redirect_uri: string,
-    ): Promise<TSpotifyAuthInfo | null> {
+    ): Promise<Spotify.AuthInfo | null> {
         const data = {
             code: code,
             redirect_uri: redirect_uri,
@@ -44,8 +44,8 @@ playlist-modify-public playlist-modify-private';
             body: new URLSearchParams(data),
         });
 
-        const json_data: TSpotifyAuthInfo =
-            (await response.json()) as TSpotifyAuthInfo;
+        const json_data: Spotify.AuthInfo =
+            (await response.json()) as Spotify.AuthInfo;
 
         if (response.status != 200) return null;
 
