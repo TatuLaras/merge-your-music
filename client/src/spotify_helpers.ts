@@ -35,6 +35,7 @@ export function reduceToSongInfo(item: Spotify.Track): TSongInfo {
                 };
             }),
         },
+        uri: item.track.uri
     } as TSongInfo;
 }
 

@@ -133,15 +133,24 @@
         background-image: var(--img-src);
         background-size: cover;
         border-radius: 10px 10px 0 0;
-        text-shadow: 2px 2px 1px black;
-        position: relative;
+        text-shadow: 1px 1px 3px black;
 
+        position: relative;
+        $padding: 2rem;
         .title {
             border-radius: 10px 10px 0 0;
             backdrop-filter: blur(32px);
-            padding: 2rem;
+            padding: $padding;
             padding-bottom: 4rem;
             margin: 0;
+        }
+
+        .track-count {
+            position: absolute;
+            bottom: 2rem;
+            left: $padding;
+            font-weight: 600;
+            font-size: 1.2rem;
         }
 
         .buttons {
@@ -156,8 +165,12 @@
             & > * {
                 padding: 0.5rem;
                 font-size: 1.4rem;
-                text-shadow: 0 0 3px black;
+                text-shadow: 1px 1px 3px black;
                 margin: 0 0.4rem;
+
+                &.disabled {
+                    opacity: 0.5;
+                }
             }
         }
     }

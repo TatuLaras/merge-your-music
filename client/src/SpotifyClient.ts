@@ -11,8 +11,7 @@ export class SpotifyClient {
     readonly baseUrl = 'https://api.spotify.com/v1';
     readonly authInfo: Spotify.AuthInfo;
     readonly invalidTokenCallback: () => void;
-    private shouldAbort = false;
-    private abortedCallback: () => void = () => {};
+    private meTracksLock: boolean = false;
 
     constructor(authInfo: Spotify.AuthInfo, invalidTokenCallback: () => void) {
         this.authInfo = authInfo;
@@ -21,13 +20,13 @@ export class SpotifyClient {
 
     async fetch<T>(url: string, options?: RequestInit): Promise<T> {
         let response = await fetch(url, options);
-        console.log(`Spotify fetch: ${url}`);
-        
+
         if (response.status === 401) {
             this.invalidTokenCallback();
             return Promise.reject('Invalid token');
         }
 
+        // Backoff-retry strategy for 429 quota exceeded
         while (response.status === 429) {
             let retryAfter = response.headers.get('Retry-After');
             if (!retryAfter) retryAfter = '10';
@@ -35,11 +34,10 @@ export class SpotifyClient {
             response = await fetch(url, options);
         }
 
-        if(response.status == 200 || response.status == 201) 
-            return response.json();
+        if (response.status != 200 && response.status != 201)
+            return Promise.reject('Spotify API error!');
 
-        return Promise.reject('Error with Spotify Api');
-        
+        return response.json();
     }
 
     async get<T>(url: string): Promise<T> {
@@ -52,13 +50,12 @@ export class SpotifyClient {
 
     async post<T>(url: string, data: any): Promise<T> {
         return this.fetch<T>(url, {
-            method: "POST",
-            headers:
-            {
-                "Content-Type": "application/json",
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
                 Authorization: `Bearer ${this.authInfo.access_token}`,
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
         });
     }
 
@@ -66,14 +63,7 @@ export class SpotifyClient {
         return this.get<Spotify.User>(`${this.baseUrl}/me`);
     }
 
-    async getMeTracks(): Promise<Spotify.Response<Spotify.Track>> {
-        return this.get<Spotify.Response<Spotify.Track>>(
-            `${this.baseUrl}/me/tracks`,
-        );
-    }
-
-    private lock: boolean = false;
-
+    // Loads all the user's liked songs 
     async loadAllMeTracks(
         newDataCallback: (
             songs: TSongInfoCollection,
@@ -83,23 +73,18 @@ export class SpotifyClient {
         setFetchedSongCount: any,
         setTotalSongCount: any,
     ) {
-        if(this.lock) return;
-        this.lock = true;
+        // Prevent multiple calls to this function
+        if (this.meTracksLock) return;
+        this.meTracksLock = true;
 
-        console.log('moi');
-        
+        // Fetch the songs in chunks of 50
         let nextUrl = `${this.baseUrl}/me/tracks?limit=50`;
         while (nextUrl) {
-            if (this.shouldAbort) {
-                console.log(`Aborting loadAllMeTracks`);
-                this.shouldAbort = false;
-                this.abortedCallback();
-                return;
-            }
-
+            // Get songs
             const response =
                 await this.get<Spotify.Response<Spotify.Track>>(nextUrl);
 
+            // For progress bar
             setTotalSongCount(response.total);
 
             const songs: TSongInfoCollection = {};
@@ -116,6 +101,7 @@ export class SpotifyClient {
                     artistIdList.push(item.track.artists[0].id);
             });
 
+            // Fetch all the artists for the chunk, needed for genre info
             const artistIdStr = artistIdList.join(',');
             const artistResponse = await this.get<any>(
                 `${this.baseUrl}/artists?ids=${artistIdStr}`,
@@ -135,17 +121,44 @@ export class SpotifyClient {
 
     async createPlaylist(playlist: TGenrePlaylist) {
         const name = capitalize(playlist.genre);
+
+        // Get user profile, required for creating a playlist
         const userProfile = await this.getMe();
+
+        // Create the playlist (empty for now)
         const url = `${this.baseUrl}/users/${userProfile.id}/playlists`;
         const postBody = {
             name: name,
-            description: "Exported from Merge Your Music",
-            public: true
+            description: 'Exported from Merge Your Music',
+            public: true,
         };
-        await this.post<any>(url, postBody);
 
-        // Add tracks ...
-        
+        const spotifyPlaylist = await this.post<Spotify.Playlist>(
+            url,
+            postBody,
+        );
+
+        let chunk: string[] = [];
+
+        // Add tracks to the playlist in chunks of 100 (the max allowed by Spotify's API)
+        for (let i = 0; i < playlist.list.length; i++) {
+            const el = playlist.list[i];
+            chunk.push(el.uri);
+            if (chunk.length == 100 || i == playlist.list.length - 1) {
+                const data = {
+                    uris: chunk,
+                    position: 0,
+                };
+
+                await this.post<any>(
+                    `${this.baseUrl}/playlists/${spotifyPlaylist.id}/tracks`,
+                    data,
+                );
+                chunk = [];
+            }
+        }
+
+        // Open the playlist in spotify in a new tab
+        window.open(spotifyPlaylist.external_urls.spotify, '_blank');
     }
-
 }

@@ -85,7 +85,19 @@ export namespace Spotify {
     }
 
     export interface Playlist {
+        collaborative: boolean;
+        description: string;
+        external_urls: { spotify: string };
+        href: string;
         id: string;
+        images: Image[];
+        name: string;
+        owner: User;
+        primary_color: string;
+        public: boolean;
+        snapshot_id: string;
+        type: 'playlist';
+        uri: string;
     }
 }
 
@@ -112,6 +124,7 @@ export interface TSongInfo {
     external_url: string;
     preview_url: string;
     album: TAlbumInfo;
+    uri: string;
 }
 
 export interface TSongInfoCollection {

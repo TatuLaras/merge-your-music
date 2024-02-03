@@ -93,6 +93,7 @@ function Results() {
                             audioPlayer.load();
                             audioPlayer.play();
                         }}
+                        spotifyClient={spotifyClient}
                     />
                 )}
                 <audio id='audio-player'>
