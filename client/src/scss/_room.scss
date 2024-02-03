@@ -1,0 +1,27 @@
+@use 'params';
+
+#room {
+    .songs-loading-status {
+        .loading-bar {
+            --border-radius: 6px;
+            --padding: 2px;
+
+            background-color: params.$russian-violet;
+            height: 1rem;
+            width: 100%;
+            padding: var(--padding);
+            margin-top: 10px;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+        }
+
+        .loading-bar .inner {
+            background-color: params.$dogwood-rose;
+            height: 100%;
+            width: var(--loading-bar-width);
+            border-radius: calc(var(--border-radius) - var(--padding));
+            transition: width 0.5s ease-out;
+        }
+    }
+}

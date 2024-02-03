@@ -11,7 +11,6 @@ import { parse } from 'zipson';
 
 import { QuitButton } from '../components/QuitButton';
 
-import '../css/results.css';
 import { PlaylistDetails } from '../components/PlaylistDetails';
 import { generateGenrePlaylists } from '../spotify_helpers';
 import { isChrome } from 'react-device-detect';
@@ -35,16 +34,14 @@ function Results() {
         ? { pointerEvents: 'none', overflowY: 'hidden' }
         : { pointerEvents: 'inherit', overflow: 'inherit' };
 
-    useEffect(() => {
-        if (inspectedPlaylist) {
-            document.body.style.overflow = 'hidden';
-            if (isChrome)
-                document.body.style.paddingRight = 'var(--scrollbar-width)';
-        } else {
-            document.body.style.paddingRight = '0';
-            document.body.style.overflow = 'auto';
-        }
-    }, [inspectedPlaylist]);
+    if (inspectedPlaylist) {
+        document.body.style.overflow = 'hidden';
+        if (isChrome)
+            document.body.style.paddingRight = 'var(--scrollbar-width)';
+    } else {
+        document.body.style.paddingRight = '0';
+        document.body.style.overflow = 'auto';
+    }
 
     useEffect(() => {
         // Check for cached music data, if found, use it

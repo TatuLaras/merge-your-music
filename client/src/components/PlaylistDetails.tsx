@@ -4,7 +4,6 @@ import {
 } from '../../../src/common_types/spotify_types';
 import { asCssUrl, capitalize } from '../helpers';
 
-import '../css/playlist_details.css';
 import { TrackDetails } from './TrackDetails';
 
 export function PlaylistDetails({

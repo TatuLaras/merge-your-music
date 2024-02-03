@@ -1,0 +1,46 @@
+@use 'params';
+
+#results {
+    .genres {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+        margin-top: 2rem;
+    }
+
+    .playlist-card:hover {
+        transform: translateY(-5px);
+        background-color: params.$russian-violet-light;
+    }
+
+    .playlist-card {
+        --border-radius: 10px;
+        padding: 0.8rem;
+        margin: 0.5rem;
+        background-color: params.$russian-violet;
+        color: white;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        transition:
+            transform 0.1s ease-out,
+            background-color 0.1s ease-out;
+        user-select: none;
+
+        img {
+            width: 100%;
+            border-radius: calc(var(--border-radius) / 2);
+        }
+
+        .title {
+            font-weight: 600;
+            margin-top: 0.6rem;
+            word-wrap: break-word;
+        }
+
+        .extra-info {
+            margin-top: 0.4rem;
+            word-wrap: break-word;
+            opacity: 0.5;
+            font-size: 0.9rem;
+        }
+    }
+}

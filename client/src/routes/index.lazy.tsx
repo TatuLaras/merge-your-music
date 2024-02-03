@@ -1,7 +1,6 @@
 import { createLazyFileRoute } from '@tanstack/react-router';
 import Cookies from 'js-cookie';
 
-import '../css/index.css';
 
 export const Route = createLazyFileRoute('/')({
     component: Index,

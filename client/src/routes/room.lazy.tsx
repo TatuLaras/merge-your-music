@@ -22,8 +22,6 @@ import { stringify } from 'zipson';
 import { LikedSongsLoading } from '../components/LikedSongsLoading';
 import { QuitButton } from '../components/QuitButton';
 
-import '../css/room.css';
-
 export const Route = createLazyFileRoute('/room')({
     component: Room,
 });

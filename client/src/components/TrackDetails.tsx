@@ -4,8 +4,6 @@ import {
 } from '../../../src/common_types/spotify_types';
 import { asCssUrl } from '../helpers';
 
-import '../css/playlist_details.css';
-
 export function TrackDetails({
     track,
     playPreviewAudio,
