@@ -1,0 +1,175 @@
+@use 'params';
+
+@keyframes morph {
+    0% {
+        bottom: 0;
+        right: 0;
+    }
+
+    100% {
+        right: -4rem;
+        bottom: 6rem;
+    }
+}
+
+#index {
+    .main-login-button {
+        color: params.$russian-violet-dark;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.6rem;
+        padding: 1rem;
+        border-radius: 1rem;
+        background-color: params.$olivine;
+        cursor: pointer;
+        margin: 4rem 1rem;
+        display: block;
+        width: fit-content;
+        text-align: center;
+        box-shadow: 8px 8px 0 #9f2b10;
+        transition: all 0.05s ease-out;
+        &:hover {
+            transform: translateY(2px) translateX(2px);
+            box-shadow: 6px 6px 0 #9f2b10;
+        }
+
+        &:active {
+            transform: translateY(4px) translateX(4px);
+            box-shadow: 4px 4px 0 #9f2b10;
+        }
+    }
+
+    .hero {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-image: url('assets/bg1.svg');
+        background-size: 100% 100%;
+        animation: morph 8s ease-in-out infinite alternate-reverse;
+        h1 {
+            font-family: 'Sixtyfour', sans-serif;
+            text-shadow: 8px 8px 0 params.$dogwood-rose;
+            font-weight: 400;
+            font-size: 7rem;
+            user-select: none;
+            margin-top: 9rem;
+            mix-blend-mode: difference;
+            line-height: 1;
+        }
+
+        .main-login-button {
+            color: params.$russian-violet;
+            margin: 6rem 0;
+            mix-blend-mode: difference;
+            background-color: white;
+            box-shadow: 8px 8px 0 params.$dogwood-rose;
+            &:hover {
+                box-shadow: 6px 6px 0 params.$dogwood-rose;
+            }
+
+            &:active {
+                box-shadow: 4px 4px 0 params.$dogwood-rose;
+            }
+        }
+    }
+
+    .fade {
+        position: relative;
+        z-index: 1;
+        height: 20rem;
+        margin-top: 35rem;
+        background-image: url('assets/divider.svg');
+        background-size: 100% 100%;
+        pointer-events: none;
+    }
+    .content {
+        z-index: 1;
+        position: relative;
+        background-color: params.$russian-violet-dark;
+        padding: 8rem 16rem 0 16rem;
+        padding-top: 6rem;
+
+        h1, h2, h3 {
+            color: params.$olivine;
+        }
+
+        p {
+            margin: 2rem 0;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: params.$olivine;
+        }
+    }
+
+    footer {
+        margin-top: 15rem;
+        padding: 0 4rem;
+        border-radius: 0.5rem 0.5rem 0 0;
+        background-color: params.$russian-violet;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: stretch;
+
+        .left {
+            margin: 3rem 0;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+
+            a {
+                color: params.$carolina-blue;
+                // text-decoration: none;
+                font-weight: 700;
+                font-size: 1.1rem;
+                margin: 0.5rem 0;
+            }
+        }
+
+        .right {
+            flex: 1;
+            margin: 3rem 0;
+
+            p {
+                font-size: 1.1rem;
+                margin: 1rem 0;
+                color: white;
+                color: params.$carolina-blue;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 950px) {
+    #index {
+        .content {
+            padding: 6rem 8rem 0 8rem;
+        }
+    }
+}
+
+@media screen and (max-width: 600px) {
+    #index {
+        .hero h1 {
+            margin: 1rem !important;
+            font-size: 4rem !important;
+        }
+
+        .fade {
+            height: 10rem;
+            margin-top: 22rem;
+        }
+
+        .content {
+            padding: 6rem 2rem 0 2rem;
+        }
+
+        footer {
+            padding: 0 2rem;
+        }
+    }
+}

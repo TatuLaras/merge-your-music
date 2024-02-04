@@ -1,27 +1,85 @@
 @use 'params';
 
 #room {
-    .songs-loading-status {
-        .loading-bar {
-            --border-radius: 6px;
-            --padding: 2px;
+    .content {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: center;
 
-            background-color: params.$russian-violet;
-            height: 1rem;
+        .songs-loading-status {
+            margin-top: 2rem;
+            align-self: center;
+            max-width: 45rem;
             width: 100%;
-            padding: var(--padding);
-            margin-top: 10px;
-            border-radius: var(--border-radius);
-            display: flex;
-            align-items: center;
+            background-color: params.$russian-violet;
+            padding: 2rem;
+            border-radius: 1rem;
+
+            p {
+                font-weight: 600;
+                font-size: 1.2rem;
+            }
+            .loading-bar {
+                --border-radius: 6px;
+                --padding: 2px;
+
+                background-color: params.$russian-violet-light;
+                height: 1rem;
+                width: 100%;
+                padding: var(--padding);
+                margin-top: 2rem;
+                border-radius: var(--border-radius);
+                display: flex;
+                align-items: center;
+                max-width: 50rem;
+            }
+
+            .loading-bar .inner {
+                background-color: params.$dogwood-rose;
+                height: 100%;
+                width: var(--loading-bar-width);
+                border-radius: calc(var(--border-radius) - var(--padding));
+                transition: width 0.5s ease-out;
+            }
         }
 
-        .loading-bar .inner {
-            background-color: params.$dogwood-rose;
-            height: 100%;
-            width: var(--loading-bar-width);
-            border-radius: calc(var(--border-radius) - var(--padding));
-            transition: width 0.5s ease-out;
+        .link {
+            align-self: center;
+            text-align: center;
+            padding: 2rem;
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: params.$russian-violet;
+            .info {
+                font-weight: 600;
+                font-size: 1.2rem;
+            }
+            .url {
+                display: flex;
+                margin-top: 1rem;
+                .text {
+                    flex: 1;
+                    padding: 1rem;
+                    background-color: params.$russian-violet-light;
+                    border-radius: 0.5rem 0 0 0.5rem;
+                    width: fit-content;
+                }
+
+                .button-copy {
+                    padding: 1rem;
+                    border-left: 2px solid params.$russian-violet;
+                    cursor: pointer;
+                    background-color: params.$russian-violet-light;
+                    border-radius: 0 0.5rem 0.5rem 0;
+
+                    &:hover {
+                        background-color: params.$russian-violet-lighter;
+                    }
+                }
+            }
         }
     }
 }

@@ -1,6 +1,21 @@
 @use 'params';
 
 #results {
+    .content .top {
+        user-select: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .end {
+            display: flex;
+            align-items: center;
+            .logo {
+                height: 2.5rem;
+                padding: 0 2rem;
+            }
+        }
+    }
+
     .genres {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));

@@ -6,8 +6,9 @@ export function QuitButton({
 }) {
     function quitSession() {
         Cookies.remove('room_id');
+        Cookies.remove('own_tokens');
         localStorage.clear();
-        window.location.href = '/';
+        window.location.replace('/');
     }
 
     return (

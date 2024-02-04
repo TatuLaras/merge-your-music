@@ -7,9 +7,10 @@ export function ProfileSummary({
 }) {
     if (!userProfile) return null;
     return (
-        <div className='profile'>
-            <img src={userProfile.images[userProfile.images.length - 1].url} />
-            <h2>{userProfile.display_name}</h2>
+        <div className='user-profile'>
+            <img src={userProfile.images[0].url}
+            draggable="false" alt='Spotify profile picture'/>
+            <div className='name'>{userProfile.display_name}</div>
         </div>
     );
 }

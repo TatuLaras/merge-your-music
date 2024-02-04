@@ -15,6 +15,9 @@ import { PlaylistDetails } from '../components/PlaylistDetails';
 import { generateGenrePlaylists } from '../spotify_helpers';
 import { isChrome } from 'react-device-detect';
 import { PlaylistCard } from '../components/PlaylistCard';
+import { ProfileSummary } from '../components/ProfileSummary';
+
+import spotifyLogo from '../assets/Spotify_Logo.png';
 
 export const Route = createLazyFileRoute('/results')({
     component: Results,
@@ -29,6 +32,7 @@ function Results() {
     const [inspectedPlaylist, setInspectedPlaylist] =
         useState<TGenrePlaylist | null>(null);
     const [playlistDetailsBg, setPlaylistDetailsBg] = useState<string>('');
+    const [userProfile, setUserProfile] = useState<Spotify.User | null>(null);
 
     const pointerEvents: React.CSSProperties = inspectedPlaylist
         ? { pointerEvents: 'none', overflowY: 'hidden' }
@@ -70,10 +74,27 @@ function Results() {
         );
     }, []);
 
+    useEffect(() => {
+        if (!spotifyClient) return;
+        // TODO other user, not self
+        spotifyClient.getMe().then((user) => setUserProfile(user));
+    }, [spotifyClient]);
+
     return (
         <div className='wrapper' id='results'>
             <div className='content'>
-                <QuitButton />
+                <div className='top'>
+                    <QuitButton />
+                    <div className='end'>
+                        <img
+                            src={spotifyLogo}
+                            alt='Spotify logo'
+                            draggable='false'
+                            className='logo'
+                        />
+                        <ProfileSummary userProfile={userProfile} />
+                    </div>
+                </div>
                 {inspectedPlaylist && (
                     <PlaylistDetails
                         playlist={inspectedPlaylist}
@@ -107,14 +128,11 @@ function Results() {
                                     key={i}
                                     playlist={playlist}
                                     playlistCoverUrl={
-                                        playlist.list[i % playlist.list.length]
-                                            .album.image
+                                        playlist.list[0].album.image
                                     }
                                     setInspectedPlaylist={() => {
                                         setPlaylistDetailsBg(
-                                            playlist.list[
-                                                i % playlist.list.length
-                                            ].album.image,
+                                            playlist.list[0].album.image,
                                         );
                                         setInspectedPlaylist(playlist);
                                     }}

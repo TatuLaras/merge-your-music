@@ -1,6 +1,8 @@
-@use '_reset';
-@use '_base';
+@use 'reset';
+@use 'base';
 
-@use '_room';
-@use '_results';
-@use '_playlist_details'
+@use 'index';
+@use 'room';
+@use 'results';
+@use 'playlist_details';
+@use 'profile';

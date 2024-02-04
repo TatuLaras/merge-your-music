@@ -21,6 +21,7 @@ import { stringify } from 'zipson';
 
 import { LikedSongsLoading } from '../components/LikedSongsLoading';
 import { QuitButton } from '../components/QuitButton';
+import { Link } from '../components/Link';
 
 export const Route = createLazyFileRoute('/room')({
     component: Room,
@@ -168,7 +169,9 @@ function Room() {
         `${import.meta.env.VITE_BACKEND_WS_BASE}/` + roomId,
         {
             onOpen: () => {
-                setLink(`${import.meta.env.VITE_BACKEND_BASE_URL}/share/` + roomId);
+                setLink(
+                    `${import.meta.env.VITE_BACKEND_BASE_URL}/share/` + roomId,
+                );
             },
             onClose: onClose,
             shouldReconnect: () => true,
@@ -213,10 +216,10 @@ function Room() {
 
     const pageContentInStage = {
         waiting: (
-            <div className='link'>
-                <p>Send this link to someone:</p>
-                <p>{link}</p>
-            </div>
+            <>
+                <QuitButton />
+                <Link link={link} />
+            </>
         ),
         sync: (
             <>
