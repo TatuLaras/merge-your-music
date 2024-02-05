@@ -26,7 +26,7 @@ export class SpotifyClient {
             return Promise.reject('Invalid token');
         }
 
-        // Backoff-retry strategy for 429 quota exceeded
+        // Backoff-retry strategy for error 429 (quota exceeded)
         while (response.status === 429) {
             let retryAfter = response.headers.get('Retry-After');
             if (!retryAfter) retryAfter = '10';
@@ -35,7 +35,9 @@ export class SpotifyClient {
         }
 
         if (response.status != 200 && response.status != 201)
-            return Promise.reject('Spotify API error!');
+            return Promise.reject(
+                'Spotify API error: ' + JSON.stringify(response),
+            );
 
         return response.json();
     }
@@ -63,7 +65,7 @@ export class SpotifyClient {
         return this.get<Spotify.User>(`${this.baseUrl}/me`);
     }
 
-    // Loads all the user's liked songs 
+    // Loads all the user's liked songs
     async loadAllMeTracks(
         newDataCallback: (
             songs: TSongInfoCollection,
@@ -92,7 +94,7 @@ export class SpotifyClient {
 
             const artistIdList: string[] = [];
 
-            response.items.forEach((item) => {
+            response.items.forEach((item: Spotify.Track) => {
                 if (item.track.is_local) return;
 
                 songs[item.track.id] = reduceToSongInfo(item);
@@ -103,29 +105,29 @@ export class SpotifyClient {
 
             // Fetch all the artists for the chunk, needed for genre info
             const artistIdStr = artistIdList.join(',');
-            const artistResponse = await this.get<any>(
+            const artistResponse = await this.get<Spotify.ArtistResponse>(
                 `${this.baseUrl}/artists?ids=${artistIdStr}`,
             );
 
-            artistResponse.artists.forEach((artist: any) => {
+            artistResponse.artists.forEach((artist: Spotify.Artist) => {
                 if (artist.genres.length == 0) return;
                 genres[artist.id] = artist.genres;
             });
 
+            // Call the user-provided callback for registering a new chunk of music data
             await newDataCallback(songs, genres);
+
             setFetchedSongCount((old: any) => old + response.items.length);
+
             nextUrl = response.next;
         }
         finalCallback();
     }
 
-    async createPlaylist(playlist: TGenrePlaylist) {
-        const name = capitalize(playlist.genre);
-
-        // Get user profile, required for creating a playlist
+    private async createEmptyPlaylist(name: string): Promise<Spotify.Playlist> {
+        // Get user profile, the id of which is required for creating a playlist
         const userProfile = await this.getMe();
 
-        // Create the playlist (empty for now)
         const url = `${this.baseUrl}/users/${userProfile.id}/playlists`;
         const postBody = {
             name: name,
@@ -133,14 +135,18 @@ export class SpotifyClient {
             public: true,
         };
 
-        const spotifyPlaylist = await this.post<Spotify.Playlist>(
-            url,
-            postBody,
-        );
+        return this.post<Spotify.Playlist>(url, postBody);
+    }
+
+    async createPlaylist(playlist: TGenrePlaylist) {
+        const name = capitalize(playlist.genre);
+
+        const spotifyPlaylist = await this.createEmptyPlaylist(name);
+
+        // Add tracks to the playlist in chunks of 100 (the max allowed by spotify's API)
 
         let chunk: string[] = [];
 
-        // Add tracks to the playlist in chunks of 100 (the max allowed by Spotify's API)
         for (let i = 0; i < playlist.list.length; i++) {
             const el = playlist.list[i];
             chunk.push(el.uri);

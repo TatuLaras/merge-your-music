@@ -84,6 +84,10 @@ export namespace Spotify {
         popularity: number;
     }
 
+    export interface ArtistResponse {
+        artists: Artist[];
+    }
+
     export interface Playlist {
         collaborative: boolean;
         description: string;
@@ -104,7 +108,7 @@ export namespace Spotify {
 export interface TAlbumInfo {
     name: string;
     release_date: string;
-    image: string;
+    images: Spotify.Image[];
     id: string;
     external_url: string;
     artists: TArtistInfo[];

@@ -1,6 +1,4 @@
-import {
-    TGenrePlaylist,
-} from '../../../src/common_types/spotify_types';
+import { TGenrePlaylist } from '../../../src/common_types/spotify_types';
 import { capitalize } from '../helpers';
 
 export function PlaylistCard({
@@ -9,7 +7,7 @@ export function PlaylistCard({
     setInspectedPlaylist,
 }: {
     playlist: TGenrePlaylist;
-    playlistCoverUrl: string,
+    playlistCoverUrl: string;
     setInspectedPlaylist: (playlist: TGenrePlaylist) => void;
 }) {
     return (
@@ -18,11 +16,14 @@ export function PlaylistCard({
             className='playlist-card'
             onClick={() => setInspectedPlaylist(playlist)}
         >
-            <img
-                src={playlistCoverUrl}
-                alt='Playlist cover'
-                draggable={false}
-            />
+            <div
+                className='cover'
+                style={
+                    {
+                        '--img-src': `url('${playlistCoverUrl}')`,
+                    } as React.CSSProperties
+                }
+            ></div>
             <div className='title'>{capitalize(playlist.genre)}</div>
             <div className='extra-info'>{playlist.list.length} tracks</div>
         </div>

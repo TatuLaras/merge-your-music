@@ -29,15 +29,15 @@ function Index() {
                     Merge your music taste with someone else's!
                 </h2>
                 <p>
-                    Login with Spotify and send a link to your friend to start generating plalists of music you both enjoy.
+                    <a href={login_uri} className='text-link'>Login with Spotify</a> and send a link to your friend to start generating plalists from music you both enjoy.
                 </p>
                 <a href={login_uri} className='main-login-button'>Login with Spotify</a>
             <footer>
                 <div className="left">
                     <a href="#">Privacy policy</a>
-                    <a href="#">Coffee</a>
                     <a href="https://www.laras.cc/">Developer homepage</a>
                     <a href="#">Project on Github</a>
+                    <a href="https://ko-fi.com/tatularas">Help me keep the website running!</a>
                 </div>
                 <div className="right">
                     <p>© Tatu Laras 2024</p>

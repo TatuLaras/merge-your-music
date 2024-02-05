@@ -32,7 +32,6 @@ function Results() {
     const [inspectedPlaylist, setInspectedPlaylist] =
         useState<TGenrePlaylist | null>(null);
     const [playlistDetailsBg, setPlaylistDetailsBg] = useState<string>('');
-    const [userProfile, setUserProfile] = useState<Spotify.User | null>(null);
 
     const pointerEvents: React.CSSProperties = inspectedPlaylist
         ? { pointerEvents: 'none', overflowY: 'hidden' }
@@ -50,7 +49,10 @@ function Results() {
     useEffect(() => {
         // Check for cached music data, if found, use it
         const compressed = localStorage.getItem('musicData');
-        if (!compressed) return; // otherwise redirect
+        if (!compressed) {
+            window.location.replace('/');
+            return;
+        } // otherwise redirect
 
         const musicData = parse(compressed) as TMusicData;
         const lists = generateGenrePlaylists(musicData);
@@ -74,12 +76,6 @@ function Results() {
         );
     }, []);
 
-    useEffect(() => {
-        if (!spotifyClient) return;
-        // TODO other user, not self
-        spotifyClient.getMe().then((user) => setUserProfile(user));
-    }, [spotifyClient]);
-
     return (
         <div className='wrapper' id='results'>
             <div className='content'>
@@ -92,7 +88,7 @@ function Results() {
                             draggable='false'
                             className='logo'
                         />
-                        <ProfileSummary userProfile={userProfile} />
+                        <ProfileSummary />
                     </div>
                 </div>
                 {inspectedPlaylist && (
@@ -128,11 +124,20 @@ function Results() {
                                     key={i}
                                     playlist={playlist}
                                     playlistCoverUrl={
-                                        playlist.list[0].album.image
+                                        playlist.list[0].album.images[
+                                            Math.min(
+                                                1,
+                                                playlist.list[0].album.images
+                                                    .length,
+                                            )
+                                        ].url
                                     }
                                     setInspectedPlaylist={() => {
                                         setPlaylistDetailsBg(
-                                            playlist.list[0].album.image,
+                                            playlist.list[0].album.images[
+                                                playlist.list[0].album.images
+                                                    .length - 1
+                                            ].url,
                                         );
                                         setInspectedPlaylist(playlist);
                                     }}

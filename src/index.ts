@@ -139,7 +139,7 @@ app.get('/share/:id', (req: any, res: any) => {
     }
 
     res.cookie('room_id', roomId);
-    res.redirect('/spotify_login');
+    res.redirect(process.env.FINAL_REDIRECT_URI);
 });
 
 app.listen(process.env.PORT, () => {
@@ -150,7 +150,8 @@ function cleanupRoomIds() {
     openConnections.forEach((room, id) => {
         if (
             room.created.getTime() <
-            new Date().getTime() - 1000 * 60 * 60 * 24 // 24 hours
+            new Date().getTime() - 1000 * 60 * 60 // 1 hour
+            && room.connections.length == 0
         ) {
             openConnections.delete(id);
         }

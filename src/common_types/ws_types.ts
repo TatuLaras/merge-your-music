@@ -1,4 +1,4 @@
-import { TSongInfoCollection, TGenreMapping } from './spotify_types';
+import { TSongInfoCollection, TGenreMapping, Spotify } from './spotify_types';
 
 export enum WsErrorCode {
     None = 1005,
@@ -10,6 +10,7 @@ export enum WsErrorCode {
 export enum WsMessageType {
     Ready,
     DataDone,
+    Profile,
     Abort,
     Data,
 }
@@ -39,6 +40,18 @@ export function sendAbort(sendMessage: (msg: string) => void) {
     const message: TWebsocketMessage = {
         type: WsMessageType.Abort,
         data: null,
+    };
+    sendMessage(JSON.stringify(message));
+}
+
+
+export function sendProfile(
+    data: Spotify.User,
+    sendMessage: (msg: string) => void
+) {
+    const message: TWebsocketMessage = {
+        type: WsMessageType.Profile,
+        data: data,
     };
     sendMessage(JSON.stringify(message));
 }

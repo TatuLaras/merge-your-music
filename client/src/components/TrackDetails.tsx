@@ -19,7 +19,7 @@ export function TrackDetails({
     return (
         <div className='track'>
             <div
-                style={asCssUrl(track.album.image)}
+                style={asCssUrl(track.album.images[track.album.images.length - 1].url)}
                 className='image'
                 onClick={(e) => {
                     playPreviewAudio(track.preview_url);

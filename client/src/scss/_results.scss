@@ -4,6 +4,7 @@
     .content .top {
         user-select: none;
         display: flex;
+        flex-wrap: wrap;
         justify-content: space-between;
         align-items: center;
         .end {
@@ -40,9 +41,13 @@
             background-color 0.1s ease-out;
         user-select: none;
 
-        img {
+        .cover {
+            aspect-ratio: 1;
             width: 100%;
             border-radius: calc(var(--border-radius) / 2);
+            background-image: var(--img-src);
+            background-color: params.$russian-violet-light;
+            background-size: cover;
         }
 
         .title {

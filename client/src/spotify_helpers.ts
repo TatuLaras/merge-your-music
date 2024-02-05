@@ -5,7 +5,7 @@ import {
     TSongInfo,
 } from '../../src/common_types/spotify_types';
 
-import { shuffle } from './helpers'
+import { shuffle } from './helpers';
 
 // Maps TSpotifyTrack to a simpler TSongInfo
 export function reduceToSongInfo(item: Spotify.Track): TSongInfo {
@@ -24,7 +24,7 @@ export function reduceToSongInfo(item: Spotify.Track): TSongInfo {
         album: {
             name: item.track.album.name,
             release_date: item.track.album.release_date,
-            image: item.track.album.images[0].url,
+            images: item.track.album.images,
             id: item.track.album.id,
             external_url: item.track.album.external_urls.spotify,
             artists: item.track.album.artists.map((artist) => {
@@ -35,7 +35,7 @@ export function reduceToSongInfo(item: Spotify.Track): TSongInfo {
                 };
             }),
         },
-        uri: item.track.uri
+        uri: item.track.uri,
     } as TSongInfo;
 }
 
@@ -43,6 +43,7 @@ export function reduceToSongInfo(item: Spotify.Track): TSongInfo {
 export function generateGenrePlaylists(
     musicData: TMusicData,
 ): TGenrePlaylist[] {
+    
     let collection: {
         [genre: string]: { [songId: string]: TSongInfo };
     } = {};
@@ -50,9 +51,11 @@ export function generateGenrePlaylists(
     // Populate collection, object used to ensure no duplicate songs or genres
     Object.keys(musicData.songs).forEach((songId) => {
         const song: TSongInfo = musicData.songs[songId];
+
         song.artists.forEach((artist) => {
             const genres = musicData.genres[artist.id];
             if (!genres) return;
+
             genres.forEach((genre) => {
                 if (!(genre in collection)) collection[genre] = {};
                 collection[genre][songId] = song;
@@ -71,19 +74,18 @@ export function generateGenrePlaylists(
         });
     });
 
-
     // Filter out playlists with too few songs
     result = result.filter((item) => item.list.length >= 10);
 
-    // Sort by playlist length
+    // Sort by playlists by length
     result.sort((a, b) => {
         return b.list.length - a.list.length;
     });
 
     // Shuffle each playlist
-    result = result.map(playlist => {
-        playlist.list = shuffle(playlist.list)
-        return playlist
+    result = result.map((playlist) => {
+        playlist.list = shuffle(playlist.list);
+        return playlist;
     }) as TGenrePlaylist[];
 
     return result;

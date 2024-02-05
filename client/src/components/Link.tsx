@@ -16,7 +16,7 @@ export function Link({ link }: { link: string }) {
             </p>
             <div className='url'>
                 <div className='text'>{link}</div>
-                <div className='button-copy' onClick={copyLinkToClipboard}>
+                <div className='button-copy' onClick={copyLinkToClipboard} title='Copy to clipboard'>
                     {linkCopied ? (
                         <i className='fa-solid fa-check'></i>
                     ) : (

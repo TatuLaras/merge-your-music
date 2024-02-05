@@ -8,6 +8,7 @@ import {
     WsMessageType,
     sendAbort,
     sendData,
+    sendProfile,
 } from '../../../src/common_types/ws_types';
 import Cookies from 'js-cookie';
 import { SpotifyClient } from '../SpotifyClient';
@@ -39,7 +40,7 @@ function Room() {
     const [genres, setGenres] = useState<TGenreMapping>({});
     const [readyToSync, setReadyToSync] = useState<boolean>(false);
     const [stage, setStage] = useState<'waiting' | 'sync'>('waiting');
-
+    let userSent = false;
     useEffect(() => {
         // Check for cached music data, if found, use it
         const compressed = localStorage.getItem('musicData');
@@ -53,17 +54,13 @@ function Room() {
         // Get Spotify auth info from cookies, redirect to login if none
         const tokens = Cookies.get('own_tokens');
         if (!tokens)
-            window.location.replace(
-                `${import.meta.env.VITE_BACKEND_BASE_URL}/spotify_login`,
-            );
+            window.location.replace('/');
         const authInfo: Spotify.AuthInfo = JSON.parse(tokens!);
         setSpotifyClient(
             new SpotifyClient(authInfo, () => {
                 // Invalid token handler
                 Cookies.remove('own_tokens');
-                window.location.replace(
-                    `${import.meta.env.VITE_BACKEND_BASE_URL}/spotify_login`,
-                );
+                window.location.replace('/');
             }),
         );
     }, []);
@@ -73,7 +70,14 @@ function Room() {
         genres: TGenreMapping,
         internal: boolean = true,
     ) {
-        if (internal) sendData({ songs: songs, genres: genres }, sendMessage);
+        if (internal) {
+            sendData({ songs: songs, genres: genres }, sendMessage);
+            if (!userSent) {
+                const user = await spotifyClient?.getMe();
+                sendProfile(user!, sendMessage);
+                userSent = true;
+            }
+        }
 
         setLikedSongs((old) => {
             return {
@@ -203,6 +207,10 @@ function Room() {
 
             case WsMessageType.Abort:
                 if (stage === 'sync') location.reload();
+                break;
+
+            case WsMessageType.Profile:
+                Cookies.set('other_profile', JSON.stringify(message.data));
                 break;
 
             default:
