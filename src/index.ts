@@ -5,6 +5,7 @@ import {
     WsErrorCode,
     WsMessageType,
 } from './common_types/ws_types';
+import path from 'path';
 
 var cors = require('cors');
 
@@ -29,6 +30,8 @@ app.use(
         saveUninitialized: true,
     }),
 );
+
+app.use(express.static('client/dist'));
 
 interface TRoom {
     created: Date;
@@ -113,7 +116,7 @@ app.get(
         }
 
         res.cookie('own_tokens', JSON.stringify(token));
-        res.redirect(process.env.FINAL_REDIRECT_URI);
+        res.redirect('http://localhost:5173/');
     }),
 );
 
@@ -139,7 +142,12 @@ app.get('/share/:id', (req: any, res: any) => {
     }
 
     res.cookie('room_id', roomId);
-    res.redirect(process.env.FINAL_REDIRECT_URI);
+    res.redirect('http://localhost:5173/');
+});
+
+app.get('*', (req: any, res: any) => {
+    res.sendFile(process.cwd() + '/client/dist/index.html');
+    // res.send(process.cwd() + '/client/dist/index.html');
 });
 
 app.listen(process.env.PORT, () => {
@@ -149,9 +157,8 @@ app.listen(process.env.PORT, () => {
 function cleanupRoomIds() {
     openConnections.forEach((room, id) => {
         if (
-            room.created.getTime() <
-            new Date().getTime() - 1000 * 60 * 60 // 1 hour
-            && room.connections.length == 0
+            room.created.getTime() < new Date().getTime() - 1000 * 60 * 60 && // 1 hour
+            room.connections.length == 0
         ) {
             openConnections.delete(id);
         }

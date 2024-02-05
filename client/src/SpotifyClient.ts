@@ -20,7 +20,7 @@ export class SpotifyClient {
 
     async fetch<T>(url: string, options?: RequestInit): Promise<T> {
         let response = await fetch(url, options);
-
+        
         if (response.status === 401) {
             this.invalidTokenCallback();
             return Promise.reject('Invalid token');

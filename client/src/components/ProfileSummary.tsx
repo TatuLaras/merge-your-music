@@ -8,7 +8,9 @@ export function ProfileSummary({
     const [profile, setProfile] = useState<Spotify.User | null>(null);
 
     function getProfileFromCookie() {
-        setProfile(JSON.parse(Cookies.get("other_profile")!))
+        const profileCookie = Cookies.get("other_profile");
+        if(!profileCookie) return;
+        setProfile(JSON.parse(profileCookie))
     }
 
     useEffect(() => {
