@@ -6,7 +6,7 @@ export const Route = createLazyFileRoute('/')({
 });
 
 function Index() {
-    const login_uri: string = `${import.meta.env.VITE_BACKEND_BASE_URL}/spotify_login`;
+    const login_uri: string = `/spotify_login`;
 
     const tokens = Cookies.get('own_tokens');
     if (tokens) window.location.replace('/room');

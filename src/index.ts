@@ -145,10 +145,10 @@ app.get('/share/:id', (req: any, res: any) => {
     res.redirect('/');
 });
 
-app.get('*', (req: any, res: any) => {
-    res.sendFile(process.cwd() + '/client/dist/index.html');
+//app.get('*', (req: any, res: any) => {
+//    res.sendFile(process.cwd() + '/client/dist/index.html');
     // res.send(process.cwd() + '/client/dist/index.html');
-});
+//});
 
 app.listen(process.env.PORT, () => {
     console.log(`Spotifuse listening on port ${process.env.PORT}`);
