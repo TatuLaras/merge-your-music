@@ -1,10 +1,4 @@
-# Merge Your Music
+![image](https://github.com/TatuLaras/merge-your-music/assets/34749827/3412c276-5a13-4ca6-a2f4-df7008896d7f)
 
-A webapp for generating playlists that incorporate your music taste with someone else's.
-
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/O5O3U3X4S)
-
-## Instructions
-
-To run the app, you need a .env -file in the root of the project. 
-Set it up according to the template in sample.env.
+## Project status
+The project is more or less done, but I haven't deployed it anywhere due to Spotify shutting down my API access without an explanation. I will try to resolve this issue somehow. 
