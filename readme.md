@@ -2,3 +2,6 @@
 
 ## Project status
 The project is more or less done, but I haven't deployed it anywhere due to Spotify shutting down my API access without an explanation. I will try to resolve this issue somehow. 
+
+## Instructions
+There's a file called "sample.env" in the project root. You need to fill out the information in the file and rename it to ".env".

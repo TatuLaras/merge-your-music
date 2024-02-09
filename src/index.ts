@@ -116,7 +116,7 @@ app.get(
         }
 
         res.cookie('own_tokens', JSON.stringify(token));
-        res.redirect('http://localhost:5173/');
+        res.redirect('/');
     }),
 );
 
@@ -142,7 +142,7 @@ app.get('/share/:id', (req: any, res: any) => {
     }
 
     res.cookie('room_id', roomId);
-    res.redirect('http://localhost:5173/');
+    res.redirect('/');
 });
 
 app.get('*', (req: any, res: any) => {
