@@ -46,20 +46,17 @@ app.ws('/', function (ws: any, req: any) {
 
 app.ws('/ws/:id', function (ws: any, req: any) {
     const roomId = req.params.id;
-    console.log('1');
     if (roomId.length == 0 || !openConnections.has(roomId)) {
         ws.close(WsErrorCode.RoomNotFound, 'Room not found.');
         return;
     }
 
-    console.log('2');
     const room = openConnections.get(roomId)!;
 
     if (room.connections.length >= 2) {
         ws.close(4001, 'Room is full.');
         return;
     }
-    console.log('3');
 
     room.connections.push(ws);
     if (room.connections.length == 2) {
