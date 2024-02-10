@@ -44,19 +44,22 @@ app.ws('/', function (ws: any, req: any) {
     ws.close(WsErrorCode.RoomNotSpecified, 'Room id not specified.');
 });
 
-app.ws('/:id', function (ws: any, req: any) {
+app.ws('/ws/:id', function (ws: any, req: any) {
     const roomId = req.params.id;
+    console.log('1');
     if (roomId.length == 0 || !openConnections.has(roomId)) {
         ws.close(WsErrorCode.RoomNotFound, 'Room not found.');
         return;
     }
 
+    console.log('2');
     const room = openConnections.get(roomId)!;
 
     if (room.connections.length >= 2) {
         ws.close(4001, 'Room is full.');
         return;
     }
+    console.log('3');
 
     room.connections.push(ws);
     if (room.connections.length == 2) {
@@ -145,10 +148,9 @@ app.get('/share/:id', (req: any, res: any) => {
     res.redirect('/');
 });
 
-//app.get('*', (req: any, res: any) => {
-//    res.sendFile(process.cwd() + '/client/dist/index.html');
-    // res.send(process.cwd() + '/client/dist/index.html');
-//});
+app.get('*', (req: any, res: any) => {
+    res.sendFile(process.cwd() + '/client/dist/index.html');
+});
 
 app.listen(process.env.PORT, () => {
     console.log(`Spotifuse listening on port ${process.env.PORT}`);
