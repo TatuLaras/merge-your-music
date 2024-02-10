@@ -10,6 +10,7 @@ import { Route as rootRoute } from './routes/__root'
 
 const RoomLazyImport = createFileRoute('/room')()
 const ResultsLazyImport = createFileRoute('/results')()
+const PrivacyLazyImport = createFileRoute('/privacy')()
 const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
@@ -24,6 +25,11 @@ const ResultsLazyRoute = ResultsLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/results.lazy').then((d) => d.Route))
 
+const PrivacyLazyRoute = PrivacyLazyImport.update({
+  path: '/privacy',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/privacy.lazy').then((d) => d.Route))
+
 const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
@@ -35,6 +41,10 @@ declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
     '/': {
       preLoaderRoute: typeof IndexLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/privacy': {
+      preLoaderRoute: typeof PrivacyLazyImport
       parentRoute: typeof rootRoute
     }
     '/results': {
@@ -52,6 +62,7 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren([
   IndexLazyRoute,
+  PrivacyLazyRoute,
   ResultsLazyRoute,
   RoomLazyRoute,
 ])

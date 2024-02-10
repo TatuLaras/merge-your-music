@@ -34,9 +34,9 @@ function Index() {
                 <a href={login_uri} className='main-login-button'>Login with Spotify</a>
             <footer>
                 <div className="left">
-                    <a href="#">Privacy policy</a>
+                    <a href="/privacy">Privacy policy and cookie policy</a>
                     <a href="https://www.laras.cc/">Developer homepage</a>
-                    <a href="#">Project on Github</a>
+                    <a href="https://github.com/TatuLaras/merge-your-music">Project on Github</a>
                     <a href="https://ko-fi.com/tatularas">Help me keep the website running!</a>
                 </div>
                 <div className="right">
