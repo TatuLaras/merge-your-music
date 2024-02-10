@@ -167,12 +167,11 @@ function Room() {
         }
     }
 
-    const { sendMessage, lastMessage /* , readyState */ } = useWebSocket(
-        //, readyState
+    const { sendMessage, lastMessage } = useWebSocket(
         `wss://${location.hostname}/ws/` + roomId,
         {
             onOpen: () => {
-                setLink(`/share/` + roomId);
+                setLink(`${location.origin}/share/${roomId}`);
             },
             onClose: onClose,
             shouldReconnect: () => true,
