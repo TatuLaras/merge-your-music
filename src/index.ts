@@ -148,6 +148,7 @@ app.get('/share/:id', (req: any, res: any) => {
     res.redirect('/');
 });
 
+// Frontend and backend routes will be under the same base path, backend routes take priority
 app.get('*', (req: any, res: any) => {
     res.sendFile(process.cwd() + '/client/dist/index.html');
 });

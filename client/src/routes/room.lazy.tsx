@@ -53,8 +53,7 @@ function Room() {
 
         // Get Spotify auth info from cookies, redirect to login if none
         const tokens = Cookies.get('own_tokens');
-        if (!tokens)
-            window.location.replace('/');
+        if (!tokens) window.location.replace('/');
         const authInfo: Spotify.AuthInfo = JSON.parse(tokens!);
         setSpotifyClient(
             new SpotifyClient(authInfo, () => {
@@ -117,7 +116,7 @@ function Room() {
             return;
         }
 
-        fetch(`${import.meta.env.VITE_BACKEND_BASE_URL}/new_room`, {
+        fetch('/new_room', {
             method: 'POST',
         })
             .then((res) => res.text())
@@ -170,12 +169,10 @@ function Room() {
 
     const { sendMessage, lastMessage /* , readyState */ } = useWebSocket(
         //, readyState
-        `${import.meta.env.VITE_BACKEND_WS_BASE}/` + roomId,
+        `wss://${location.hostname}/ws/` + roomId,
         {
             onOpen: () => {
-                setLink(
-                    `${import.meta.env.VITE_BACKEND_BASE_URL}/share/` + roomId,
-                );
+                setLink(`/share/` + roomId);
             },
             onClose: onClose,
             shouldReconnect: () => true,

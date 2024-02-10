@@ -1,0 +1,4 @@
+- Tests for compression and find out why it crashes browser
+- https
+- Deploy to cloud
+- Apply for extended api mode

@@ -60,18 +60,13 @@ function Results() {
 
         // Get Spotify auth info from cookies, redirect to login if none
         const tokens = Cookies.get('own_tokens');
-        if (!tokens)
-            window.location.replace(
-                `${import.meta.env.VITE_BACKEND_BASE_URL}/spotify_login`,
-            );
+        if (!tokens) window.location.replace(`/spotify_login`);
         const authInfo: Spotify.AuthInfo = JSON.parse(tokens!);
         setSpotifyClient(
             new SpotifyClient(authInfo, () => {
                 // Invalid token handler
                 Cookies.remove('own_tokens');
-                window.location.replace(
-                    `${import.meta.env.VITE_BACKEND_BASE_URL}/spotify_login`,
-                );
+                window.location.replace(`/spotify_login`);
             }),
         );
     }, []);
