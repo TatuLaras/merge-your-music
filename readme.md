@@ -1,7 +1,7 @@
 ![image](https://github.com/TatuLaras/merge-your-music/assets/34749827/a6fc09ee-aae8-40a1-9915-61e49d8f4d93)
 
 ## Project status
-The project is more or less done, but I haven't deployed it anywhere due to Spotify shutting down my API access without an explanation. I will try to resolve this issue somehow. 
+There's a [live version](https://mergeyourmusic.laras.cc/) of this project, however my Spotify API app is still in development mode, meaning that only users that I manually add to the list of beta testers can log into the app. Contact me at tatu.laras@gmail.com if you want to be added to the list of beta testers.
 
 ## Instructions
 There's a file called "sample.env" in the project root. You need to fill out the information in the file and rename it to ".env".
