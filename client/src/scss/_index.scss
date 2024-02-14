@@ -13,6 +13,47 @@
 }
 
 #index {
+    .cookie-modal {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 2;
+        background-color: params.$russian-violet;
+        padding: 1rem;
+        border-radius: 0 1rem 0 0;
+        display: flex;
+        align-items: center;
+
+        .text {
+            & > * {
+                padding: 0.2rem 0;
+            }
+
+            a {
+                color: params.$carolina-blue;
+            }
+        }
+
+        .title {
+            font-weight: 600;
+        }
+
+        button.agree {
+            margin-left: 3rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            color: white;
+            background-color: params.$russian-violet-lighter;
+            font-weight: 600;
+            align-self: flex-end;
+            cursor: pointer;
+            &:hover {
+                background-color: adjust-color($color: params.$russian-violet-lighter, $lightness: 3%);
+            }
+        }
+    }
+
     .main-login-button {
         color: params.$russian-violet-dark;
         text-decoration: none;
@@ -28,6 +69,7 @@
         text-align: center;
         box-shadow: 8px 8px 0 #9f2b10;
         transition: all 0.05s ease-out;
+        user-select: none;
         &:hover {
             transform: translateY(2px) translateX(2px);
             box-shadow: 6px 6px 0 #9f2b10;

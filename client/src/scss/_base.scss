@@ -3,8 +3,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Sixtyfour&display=swap');
 
 :root {
-    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     --scrollbar-width: 5px;
+}
+
+:root, button, input {
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 ::selection {
@@ -33,6 +36,10 @@ h2 {
 
 p {
     margin: 1rem 0;
+}
+
+button {
+    font-size: 1rem;
 }
 
 .content {
