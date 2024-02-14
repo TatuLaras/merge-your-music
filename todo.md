@@ -1,5 +1,0 @@
-- Tests for compression and find out why it crashes browser
-- Improve post-deployment development ergonomics (a way to run "npm run dev")
-- cookie popup
-- ko-fi links more visible
-- Apply for extended api mode
