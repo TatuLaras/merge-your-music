@@ -64,7 +64,7 @@ function Index() {
                     <a href={login_uri} className='text-link'>
                         Login with Spotify
                     </a>{' '}
-                    and send a link to your friend to start generating plalists
+                    and send a link to your friend to start generating playlists
                     from music you both enjoy.
                 </p>
                 <a href={login_uri} className='main-login-button'>
