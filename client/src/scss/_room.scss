@@ -67,9 +67,13 @@
                     background-color: params.$russian-violet-light;
                     border-radius: 0.5rem 0 0 0.5rem;
                     width: fit-content;
+                    word-break: break-all;
+                    word-wrap: break-word;
                 }
 
                 .button-copy {
+                    display: flex;
+                    align-items: center;
                     padding: 1rem;
                     border-left: 2px solid params.$russian-violet;
                     cursor: pointer;
