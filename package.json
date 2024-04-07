@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx tsc -w & nodemon build/index.js --ignore client",
-    "build": "npx tsc && cd client && npm run build",
+    "build-all": "npx tsc && cd client && npm run build",
+    "build": "npx tsc",
     "prod": "node build/index.js"
   },
   "author": "Tatu Laras",
