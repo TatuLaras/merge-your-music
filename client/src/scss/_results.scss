@@ -29,12 +29,11 @@
     }
 
     .playlist-card {
-        --border-radius: 10px;
-        padding: 0.8rem;
+        padding: 1rem;
         margin: 0.5rem;
         background-color: params.$russian-violet;
         color: white;
-        border-radius: var(--border-radius);
+        border-radius: 10px;
         cursor: pointer;
         transition:
             transform 0.1s ease-out,
@@ -44,15 +43,15 @@
         .cover {
             aspect-ratio: 1;
             width: 100%;
-            border-radius: calc(var(--border-radius) / 2);
             background-image: var(--img-src);
             background-color: params.$russian-violet-light;
-            background-size: cover;
+            background-size: contain;
+            background-repeat: no-repeat;
         }
 
         .title {
             font-weight: 600;
-            margin-top: 0.6rem;
+            margin-top: 0.8rem;
             word-wrap: break-word;
         }
 

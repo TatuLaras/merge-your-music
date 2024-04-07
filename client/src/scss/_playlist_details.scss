@@ -58,7 +58,7 @@
     .track {
         display: flex;
         align-items: center;
-        padding: 0.6rem 0;
+        padding: 0.7rem 0.2rem;
         margin: 0 0.7rem;
         border-top: 1px solid params.$russian-violet-light;
         height: 3rem;
@@ -72,8 +72,8 @@
             height: 100%;
             aspect-ratio: 1;
             background-image: var(--img-src);
-            background-size: cover;
-            border-radius: 5px;
+            background-size: contain;
+            background-repeat: no-repeat;
             cursor: pointer;
             display: flex;
             justify-content: center;
@@ -101,6 +101,7 @@
             a {
                 color: white;
                 padding: 0.5rem;
+                font-size: 1.4rem;
             }
         }
     }
@@ -130,8 +131,8 @@
     }
 
     .header {
-        background-image: var(--img-src);
-        background-size: cover;
+        background: rgb(221, 36, 155);
+        background: linear-gradient(45deg, #cc3363 0%, #33cc9c 100%);
         border-radius: 10px 10px 0 0;
         text-shadow: 1px 1px 3px black;
 
